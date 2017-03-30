@@ -140,7 +140,7 @@ C       :	C Se C      {$$ = Nalloc();
 	| 	V '(' L_args ')'
         ;
 
-L_args  :       %empty
+L_args  :       %empty      {$$ = Nalloc();}
 	| 	L_argsnn    {$$ = $1;}
         ;
 		
@@ -148,7 +148,7 @@ L_argsnn: 	E           {$$ = $1;}
 	| 	E ',' L_argsnn
 	;
 			
-L_argt  :       %empty
+L_argt  :       %empty      {$$ = bilenvty_vide ();}
 	| 	L_argtnn
 	;
 		
@@ -182,7 +182,7 @@ D       :	D_entp L_vart C
 	| 	D_entf L_vart C
         ;
 		
-LD      :       %empty
+LD      :       %empty     {$$ = Nalloc ();}
 	|	LD D       {$$ = $1; /*On voulait mettre une valeur marrante mais ça compile pas :( */}
         ;
 		
