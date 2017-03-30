@@ -24,7 +24,7 @@ typedef struct cellenvty{
   struct cellenvty *SUIV;} *ENVTY;
 
 /* biliste de var ou param */
-typedef struct{
+typedef struct bilenvty{
   ENVTY debut;
   ENVTY fin;}BILENVTY;
 

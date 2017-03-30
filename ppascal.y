@@ -6,6 +6,7 @@
 #include "arbre.h"
 #include "interp.h"
 
+int yyerror (char *s);
 /* ------------------VARIABLES GLOBALES -------------------------*/
   NOE syntree;          /* commande  globale                     */
   BILENVTY benvty;      /* environnement global                  */
@@ -18,11 +19,11 @@
 %start MP
 %union{NOE NO; type TYP; BILENVTY LARGT;}
 
-%type <NO>     LD MP C E Et
+%type <NO>     LD MP C E Et L_argsnn L_args
 %type <TYP>    TP
-%type <LARGT>  Argt L_vart L_vartnn L_args L_argsnn L_argt L_argtnn      
+%type <LARGT>  Argt L_vart L_vartnn L_argt L_argtnn      
 			
-%token <NO>    Pl Mo Mu Or Lt Eq And Not I V true false NewAr Se Af Sk If Th El Wh Do Dep Def NPro NFon Var Ind
+%token <NO>    Pl Mo Mu Or Lt Eq And Not I V true false NewAr Se Af Sk If Th El Wh Do Dep Def NPro NFon Var Ind Mp
 %token <TYP>   T_boo T_int T_ar T_err T_bot T_com
 %%
 
@@ -189,6 +190,12 @@ LD      :       %empty
 
 #include "arbre.h"
 #include "yy.lex.c"
+
+int yyerror (char* s)
+{
+    fprintf (stderr, "%s error\n", s);
+    return EXIT_FAILURE;
+}
 
 int main (int argc, char* argv [])
 {
