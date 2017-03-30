@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "arbre.h"
-#include "tableaux.tab.h"
+#include "ppascal.tab.h"
 #include "interp.h"
 /*-------------------------------------------------------------------*/
 /* ----------------------------types---------------------------------*/

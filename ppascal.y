@@ -6,8 +6,24 @@
 #include "arbre.h"
 #include "interp.h"
 
-%}
+/* ------------------VARIABLES GLOBALES -------------------------*/
+  NOE syntree;          /* commande  globale                     */
+  BILENVTY benvty;      /* environnement global                  */
+  int ligcour=1;        /* ligne  courante                       */
+  type tycour;          /* type courant                          */
+  ENVTY vtycour;        /* var typee courante                    */
+/* -------------------------------- -----------------------------*/
 
+%}
+%start MP
+%union{NOE NO; type TYP; BILENVTY LARGT;}
+
+%type <NO>     LD MP C E Et
+%type <TYP>    TP
+%type <LARGT>  Argt L_vart L_vartnn L_args L_argsnn L_argt L_argtnn      
+			
+%token <NO>    Pl Mo Mu Or Lt Eq And Not I V true false NewAr Se Af Sk If Th El Wh Do Dep Def NPro NFon Var Ind
+%token <TYP>   T_boo T_int T_ar T_err T_bot T_com
 %%
 
 MP      :	L_vart LD C {benvty = $1; syntree = $2; YYACCEPT;}
@@ -60,13 +76,13 @@ E       :	E Pl E      {$$ = Nalloc();
                              $$->FD = NULL;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Not");}
-	|   ’(’	E ’)’       {$$ = $2;}
+	|   '('	E ')'       {$$ = $2;}
 	| 	I           {$$ = $1;}
 	| 	V           {$$ = $1;}
 	| 	true        {$$ = $1;}
 	| 	false       {$$ = $1;}
-	| 	V ’(’ L_args ’)’
-	| 	NewAr TP ’[’ E ’]’   {$$ = Nalloc();
+	| 	V '(' L_args ')'
+	| 	NewAr TP '[' E ']'   {$$ = Nalloc();
                                       $$->codop = NewAr;
                                       type_copy(&($$->typno),$2); /* DIM,TYPEF sont connus   */
 				      ($$->typno).DIM++;          /* mise a jour DIM         */
@@ -75,11 +91,11 @@ E       :	E Pl E      {$$ = Nalloc();
 	| 	Et          {$$ = $1;}
         ;
 
-Et      :       V ’[’ E ’]’ {$$ = Nalloc();              /* un seul indice                   */
+Et      :       V '[' E ']' {$$ = Nalloc();              /* un seul indice                   */
                              $$->codop = Ind;
 			     $$->FG = $1;
 			     $$->FD = $3;}
-	| 	Et ’[’ E ’]’ {$$ = Nalloc();             /* plusieurs indices                */
+	| 	Et '[' E ']' {$$ = Nalloc();             /* plusieurs indices                */
                               $$->codop = Ind;
 			      $$->FG = $1;
 			      $$->FD = $3;}
@@ -104,7 +120,7 @@ C       :	C Se C      {$$ = Nalloc();
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Af");}
 	| 	Sk          {$$ = $1;}
-	|   ’{’ C ’}’       {$$ = $2;}
+	|   '{' C '}'       {$$ = $2;}
 	| 	If E Th C El C    {$$ = Nalloc();
                                    $$->codop = If;
                                    $$->FG = $2;         /* condition     */
@@ -120,7 +136,7 @@ C       :	C Se C      {$$ = Nalloc();
                              $$->FD = $4;         /* corps du while                   */
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Wh");}
-	| 	V ’(’ L_args ’)’
+	| 	V '(' L_args ')'
         ;
 
 L_args  :       %empty
@@ -128,7 +144,7 @@ L_args  :       %empty
         ;
 		
 L_argsnn: 	E           {$$ = $1;}
-	| 	E ’,’ L_argsnn
+	| 	E ',' L_argsnn
 	;
 			
 L_argt  :       %empty
@@ -136,10 +152,10 @@ L_argt  :       %empty
 	;
 		
 L_argtnn: 	Argt        {$$ = $1;}       
-	| 	L_argtnn ’,’ Argt
+	| 	L_argtnn ',' Argt
 	;
 			
-Argt    :	V ’:’ TP    {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
+Argt    :	V ':' TP    {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
         ;
 		
 TP      :	T_boo       {$$ = $1;}
@@ -152,13 +168,13 @@ L_vart  :       %empty      {$$ = bilenvty_vide();}
         ;
 		
 L_vartnn: 	Var Argt               {$$ = $2;}
-	| 	L_vartnn ’,’ Var Argt  {$$ = concatty ($1, $4);}
+	| 	L_vartnn ',' Var Argt  {$$ = concatty ($1, $4);}
 	;
 		
-D_entp  : 	Dep NPro ’(’ L_argt ’)’
+D_entp  : 	Dep NPro '(' L_argt ')'
         ;
 		
-D_entf  : 	Def NFon ’(’ L_argt ’)’ ’:’ TP
+D_entf  : 	Def NFon '(' L_argt ')' ':' TP
         ;
 		
 D       :	D_entp L_vart C
@@ -166,11 +182,14 @@ D       :	D_entp L_vart C
         ;
 		
 LD      :       %empty
-	|	LD D       {$$ = $69;}
+	|	LD D       {$$ = $1; /*On voulait mettre une valeur marrante mais ça compile pas :( */}
         ;
 		
 %%
-		
+
+#include "arbre.h"
+#include "yy.lex.c"
+
 int main (int argc, char* argv [])
 {
     return EXIT_SUCCESS;
