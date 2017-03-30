@@ -16,3 +16,5 @@ clean:
 	rm -f ppascal
 	rm -f *.o
 	rm -f *.yy.*
+	rm -f yy.lex.c
+	rm -f lex.yy.c
