@@ -25,6 +25,10 @@ int yyerror (char *s);
 			
 %token <NO>    Pl Mo Mu Or Lt Eq And Not I V true false NewAr Se Af Sk If Th El Wh Do Dep Def NPro NFon Var Ind Mp
 %token <TYP>   T_boo T_int T_ar T_err T_bot T_com
+%left And Or
+%left Pl Mo
+%left Mu
+%nonassoc Eq lt Not
 %%
 
 MP      :	L_vart LD C {benvty = $1; syntree = $2; YYACCEPT;}
@@ -179,7 +183,7 @@ D_entf  : 	Def NFon '(' L_argt ')' ':' TP
         ;
 		
 D       :	D_entp L_vart C
-	| 	D_entf L_vart C
+        | 	D_entf L_vart C  
         ;
 		
 LD      :       %empty     {$$ = Nalloc ();}
