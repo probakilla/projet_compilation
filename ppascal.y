@@ -19,7 +19,7 @@ int yyerror (char *s);
 %start MP
 %union{NOE NO; type TYP; BILENVTY LARGT;}
 
-%type <NO>     LD MP C E Et L_argsnn L_args
+%type <NO>     LD MP C Ca E Et L_argsnn L_args
 %type <TYP>    TP
 %type <LARGT>  Argt L_vart L_vartnn L_argt L_argtnn      
 			
@@ -106,13 +106,16 @@ Et      :       V '[' E ']' {$$ = Nalloc();              /* un seul indice      
 			      $$->FD = $3;}
         ;
 	
-C       :	C Se C      {$$ = Nalloc();
+Ca      :	C Se Ca     {$$ = Nalloc();
                              $$->codop = Se;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Se");}
-	| 	Et Af E     {$$ = Nalloc();
+        |       C           {$$ = $1;}
+;
+
+C       : 	Et Af E     {$$ = Nalloc();
                              $$->codop = Af;
                              $$->FG = $1;
                              $$->FD = $3;
@@ -126,7 +129,7 @@ C       :	C Se C      {$$ = Nalloc();
                              strcpy($$->ETIQ,"Af");}
 	| 	Sk          {$$ = $1;}
 	|   '{' C '}'       {$$ = $2;}
-	| 	If E Th C El C    {$$ = Nalloc();
+	| 	If E Th C El Ca   {$$ = Nalloc();
                                    $$->codop = If;
                                    $$->FG = $2;         /* condition     */
                                    $$->FD = Nalloc();   /* alternative   */
@@ -135,7 +138,7 @@ C       :	C Se C      {$$ = Nalloc();
 			           $$->FD->FD = $6;     /* branche false */
                                    $$->ETIQ = malloc(2);
                                    strcpy($$->ETIQ,"IfThEl");}
-	| 	Wh E Do C   {$$ = Nalloc();
+	| 	Wh E Do Ca   {$$ = Nalloc();
                              $$->codop = Wh;
                              $$->FG = $2;         /* condition d'entree dans le while */
                              $$->FD = $4;         /* corps du while                   */
@@ -200,6 +203,7 @@ int yyerror (char* s)
     fprintf (stderr, "%s error\n", s);
     return EXIT_FAILURE;
 }
+
 
 int main (int argc, char* argv [])
 {
