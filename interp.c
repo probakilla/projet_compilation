@@ -28,7 +28,7 @@ void init_memoire()
 {int i=0;
 while (i < TAILLEMEM)
   TAS[i++]=0;
-i=0;
+ i=0;
 while (i < TAILLEADR)
   {ADR[i++]=0;
    TAL[i]=0;
@@ -88,10 +88,12 @@ int semval(BILENVTY rho_gb,NOE e)
 	case NewAr:                     /*creation tableau */
 	  {
 	    int taille = semval (rho_gb, e->FD);
-	    ADR[padrl] = ptasl;
+	    res = padrl
+	    ADR[res] = ptasl;
 	    ptasl += taille;
-	    TAL[padrl] = taille;
-	    return padrl++;
+	    TAL[res] = taille;
+	    padrl++;
+	    return res;
 	  }
 	default: return(EXIT_FAILURE);  /* codop inconnu au bataillon */
 	  }
@@ -122,7 +124,7 @@ void semop_gp(BILENVTY rho_gb, NOE c)
 	      assert(c->FG->codop==Ind);/* affectation a un tableau */
 	      int tab = semval(rho_gb, c->FG->FG);
 	      int ind = semval(rho_gb, c->FG->FD);
-	      TAS[ADR[tab] + ind] = semval(rho_gb, c->FD);
+	      TAS[ADR[tab] + ind] = semval(rho_gb, c->FD);//TODO: tester ind < taille du tableau
 	    }
 	  break;	    
 	case Sk: break;
@@ -130,15 +132,18 @@ void semop_gp(BILENVTY rho_gb, NOE c)
 	  semop_gp(rho_gb, c->FG);
 	  semop_gp(rho_gb, c->FD);
 	  break; 
-	case If:/* a ecrire */
+	case If:
 	  if (semval(rho_gb, c->FG))
-	    semop_gp(rho_gb, c->FD->FD);
-	  else
 	    semop_gp(rho_gb, c->FD->FG);
+	  else
+	    semop_gp(rho_gb, c->FD->FD);
 	  break;
-	case Wh:/* a ecrire */
+	case Wh:
 	  while (semval(rho_gb,  c->FG))
+	    {
 	    semop_gp(rho_gb, c->FD);
+	    semop_gp(rho_gb, c);
+	    }
 	  break;
 	default: break;
 	}

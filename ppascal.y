@@ -1,3 +1,9 @@
+/*Projet de compilation réalisé par:
+  -Chloé Pathé
+  -Jimmy Menan
+  -Julien Pilleux
+  -Guillaume Chupin
+*/
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -195,7 +201,6 @@ LD      :       %empty     {$$ = Nalloc ();}
 		
 %%
 
-#include "arbre.h"
 #include "yy.lex.c"
 
 int yyerror (char* s)
