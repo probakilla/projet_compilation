@@ -37,7 +37,7 @@ typedef struct cellfon{
   struct cellfon *SUIV;} *LFON;
 
 /* biliste de fonctions */
-typedef struct{
+typedef struct bilfon{
   LFON debut;
   LFON fin;}BILFON;
 

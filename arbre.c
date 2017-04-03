@@ -383,7 +383,99 @@ LFON copier_fon(LFON lfn)
     }
   return copy;
 }
-  
+
+void ecrire_fon(LFON bfn)
+{
+  if (bfn == NULL)
+    printf("fin d'environnement \n");
+  else
+    {
+      printf("Nom de la fonction: %s\n", bfn->ID);
+      printf("Paramètre de la fonction:\n");
+      printf("------------------------:\n");
+      ecrire_bilenvty(bfn->PARAM);
+      printf("Les variables locales:\n");
+      printf("------------------------:\n");
+      ecrire_bilenvty(bfn->VARLOC);
+      printf("Corps de la fonction:\n");
+      printf("------------------------:\n");
+      prefix(bfn->CORPS);
+      
+    }
+}
+
+LFON rechfon(char *chaine, LFON listident)
+{
+  if (listident!=NULL)
+    if (strcmp(listident->ID,chaine)==0)
+      {
+	printf("trouve %s en position %p \n",chaine,listident);
+	return listident;
+      }
+    else
+      return rechfon(chaine, listident->SUIV);
+  else
+    return NULL;
+}
+
+BILFON bilfon_vide()
+{
+  BILFON bfn;
+  bfn.debut = NULL;
+  bfn.fin = NULL;
+  return bfn;
+}
+
+BILFON creer_bilfon(LFON pfon)
+{
+  BILFON bfn;
+  bfn.debut = pfon;
+  bfn.fin = pfon;
+  return bfn;
+}
+
+BILFON copier_bilfon(BILFON bfn)
+{
+  LFON lfn, lfncour;
+  BILFON bfncp;
+  lfn = copier_fon(bfn.debut);
+  bfncp.debut = lfn;
+  lfncour = lfn;
+  while (lfncour && lfncour->SUIV)
+    lfncour = lfncour->SUIV;
+  bfncp.fin = lfncour;
+  return bfncp;
+}
+
+BILFON concatfn(BILFON bfn1, BILFON bfn2)
+{
+  BILFON bfn, nbfn1, nbfn2;
+  nbfn1 = copier_bilfon(bfn1);
+  nbfn2 = copier_bilfon(bfn2);
+  if (nbfn1.fin !=NULL)
+    if (nbfn2.fin !=NULL)
+      {
+	nbfn1.fin->SUIV = nbfn2.debut;
+	bfn.debut = nbfn1.debut;
+	bfn.fin = nbfn2.fin;
+	return bfn;
+      }
+    else
+      return nbfn1;
+  else
+    return nbfn2;
+}
+
+BILENVTY allvars(BILFON bfon)
+{
+  //Pas trop compris ce qu'il fallait faire (incomplet)
+  return concatty(bfon.debut->PARAM, bfon.debut->VARLOC);
+}
+
+void ecrire_bilfon(BILFON bfn)
+{
+  ecrire_fon(bfn.debut);
+}
 /*-------------------------------------------------------------------------------*/
 /*---------------------programmes -----------------------------------------------*/
 void ecrire_prog(BILENVTY argby,NOE argno)
