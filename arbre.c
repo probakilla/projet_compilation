@@ -28,6 +28,10 @@ type *talloc()
 {
   return((type *)malloc(sizeof(type)));
 }
+LFON Lfonalloc()
+{
+  return((LFON)malloc(sizeof(struct cellfon)));
+}
 /*-------------------------------------------------------------------*/
 /*---------------------parcours d'arbres-----------------------------*/
 
@@ -53,15 +57,15 @@ int type_eq(type t1, type t2)
 /* copie torig vers *tcop  */
 void type_copy(type *tcop,type torig)
 {tcop->DIM=torig.DIM;
- tcop->TYPEF=torig.TYPEF;
- return;
+  tcop->TYPEF=torig.TYPEF;
+  return;
 }
 
 /* affecte le type  de *prho      */
 void type_affect(ENVTY rho,type tvar)
 {(rho->TYPE).DIM=tvar.DIM;
- (rho->TYPE).TYPEF=tvar.TYPEF;
- return;
+  (rho->TYPE).TYPEF=tvar.TYPEF;
+  return;
 }
 
 /* retourne le type                  */
@@ -89,16 +93,16 @@ ENVTY creer_envty(char *etiq, type tau, int val)
 ENVTY copier_envty(ENVTY env)
 {ENVTY ety = NULL;
   if (env != NULL)
-  {
-  ety= Envtalloc();
-  if (env->ID!=NULL)
-    {ety->ID=Idalloc();
-     strcpy(ety->ID,env->ID);}
-  type_copy(&(ety->TYPE),env->TYPE);
-  ety->VAL=env->VAL;
-  ety->SUIV= copier_envty(env->SUIV);
-  }
-return(ety);
+    {
+      ety= Envtalloc();
+      if (env->ID!=NULL)
+	{ety->ID=Idalloc();
+	  strcpy(ety->ID,env->ID);}
+      type_copy(&(ety->TYPE),env->TYPE);
+      ety->VAL=env->VAL;
+      ety->SUIV= copier_envty(env->SUIV);
+    }
+  return(ety);
 }
 
 /* retourne (arg1 op arg2) ou bien (op arg1) pour op "de base "*/
@@ -235,7 +239,7 @@ int valchty(ENVTY rho, char *var)
 void inbilenvty(BILENVTY *prho,char *var,type tvar)
 {ENVTY erho, pos, newcell;
   erho=prho->debut;
-      pos=rechty(var,erho);/* adresse de la cellule contenant var */
+  pos=rechty(var,erho);/* adresse de la cellule contenant var */
   if (pos == NULL)
     /*on insere var en tete de envrnt*/
     { 
@@ -246,7 +250,7 @@ void inbilenvty(BILENVTY *prho,char *var,type tvar)
       newcell->VAL=0;
       type_affect(newcell,tvar);
       newcell->SUIV=erho;
-            prho->debut=newcell;
+      prho->debut=newcell;
     }
   else
     {
@@ -275,7 +279,7 @@ BILENVTY copier_bilenvty(BILENVTY bty)
   bcty.debut=aty;
   ctycour=aty;
   while(ctycour && ctycour->SUIV)
-      ctycour=ctycour->SUIV;
+    ctycour=ctycour->SUIV;
   bcty.fin=ctycour;
   return(bcty);
 }
@@ -288,7 +292,7 @@ BILENVTY concatty(BILENVTY bty1, BILENVTY bty2)
   nbty2=copier_bilenvty(bty2);
   if (nbty1.fin!= NULL)
     if (nbty2.debut!=NULL)
-       { nbty1.fin->SUIV=nbty2.debut;
+      { nbty1.fin->SUIV=nbty2.debut;
         bty.debut=nbty1.debut;
         bty.fin=nbty2.fin;
         return(bty);}
@@ -306,22 +310,88 @@ void ecrire_bilenvty(BILENVTY bty)
 /* affecte  la valeur rhs a la variable lhs (rho_lc prioritaire) */
 void affectb(BILENVTY rho_gb, char *lhs, int rhs)
 {ENVTY pos;
-    pos=rechty(lhs,rho_gb.debut);  
-    if (pos!=NULL)
-	pos->VAL=rhs;                   /* lhs est une var enregistree           */
-    else
-      printf("erreur: variable %s non declaree", lhs);
+  pos=rechty(lhs,rho_gb.debut);  
+  if (pos!=NULL)
+    pos->VAL=rhs;                   /* lhs est une var enregistree           */
+  else
+    printf("erreur: variable %s non declaree", lhs);
 }
 
+LFON creer_fon(char *nfon, BILENVTY lparam,BILENVTY lvars,NOE com)
+{
+  LFON fon = Lfonalloc();
+  if(nfon != NULL)
+    {
+      fon->ID = Idalloc();
+      strcpy(fon->ID, nfon);
+    }
+  fon->PARAM = lparam;
+  fon->VARLOC = lvars;
+  fon->CORPS = com;
+  fon->SUIV = NULL;
+}
 
+NOE creer_noe(int codop, type typno, char* etiq, NOE fg, NOE fd)
+{
+  NOE noeud = Nalloc();
+  noeud->codop = codop;
+  noeud->typno = typno;
+  if (etiq != NULL)
+    {
+      noeud->ETIQ = Idalloc();
+      strcpy(noeud->ETIQ, etiq);
+    }
+  noeud->FG = fg;
+  noeud->FD = fd;
+  return noeud;
+}
+
+NOE copier_noe(NOE noe)
+{
+  NOE noeud = NULL;
+  if (noe != NULL)
+    {
+      noeud = Nalloc();
+      noeud->codop = noe->codop;
+      noeud->typno = noe->typno;
+      if (noe->ETIQ != NULL)
+	{
+	  noeud->ETIQ = Idalloc();
+	  strcpy(noeud->ETIQ, noe->ETIQ);
+	}     
+      noeud->FG = copier_noe(noe->FG);
+      noeud->FD = copier_noe(noe->FD);
+    }
+  return noeud;
+}
+
+LFON copier_fon(LFON lfn)
+{
+  LFON copy = NULL;
+  if (lfn != NULL)
+    {
+      copy =  Lfonalloc();
+      if(lfn->ID != NULL)
+	{
+	  copy->ID = Idalloc();
+	  strcpy(copy->ID, lfn->ID);
+	}
+      copy->PARAM = copier_bilenvty(lfn->PARAM);
+      copy->VARLOC = copier_bilenvty(lfn->VARLOC);
+      copy->CORPS = copier_noe(lfn->CORPS);
+      copy->SUIV = copier_fon(lfn->SUIV);
+    }
+  return copy;
+}
+  
 /*-------------------------------------------------------------------------------*/
 /*---------------------programmes -----------------------------------------------*/
 void ecrire_prog(BILENVTY argby,NOE argno)
 {printf("Les variables globales:\n");
- printf("------------------------:\n");
- ecrire_bilenvty(argby);printf("\n");
+  printf("------------------------:\n");
+  ecrire_bilenvty(argby);printf("\n");
   printf("Le programme principal:\n");
- printf("------------------------:\n");
- prefix(argno);printf("\n");
- return;
+  printf("------------------------:\n");
+  prefix(argno);printf("\n");
+  return;
 }

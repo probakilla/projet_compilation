@@ -28,6 +28,20 @@ typedef struct bilenvty{
   ENVTY debut;
   ENVTY fin;}BILENVTY;
 
+/* listefonctions := liste de 4-tuples (ident, BILparametres, BILvarloc, ast) */
+typedef struct cellfon{
+  char *ID;
+  BILENVTY PARAM;    /* pametres formels  */
+  BILENVTY VARLOC;   /* variables locales */
+  NOE CORPS;
+  struct cellfon *SUIV;} *LFON;
+
+/* biliste de fonctions */
+typedef struct{
+  LFON debut;
+  LFON fin;}BILFON;
+
+
 /*------------------FONCTIONS ---------------------------------------------------*/
 /*---------------------parcours d'arbres-----------------------------------------*/
 extern int yylex();          /* fonction generee par flex                        */
@@ -37,6 +51,7 @@ extern char *Idalloc();      /* retourne un tableau de MAXIDENT char            
 extern NOE Nalloc();         /* retourne un NOE                                  */
 extern ENVTY Envtalloc();    /* retourne un ENVTY                                */
 extern type *talloc();       /* retourne un pointeur sur type *                  */
+extern LFON  Lfonalloc();    /* retourne un LFON                                 */
 /*---------------------parcours d'arbres-----------------------------------------*/
  extern void prefix(NOE n);   /* ecrit l'expression n en notation prefixe         */
 /*---------------------environnements--------------------------------------------*/
@@ -62,7 +77,21 @@ extern BILENVTY copier_bilenvty(BILENVTY bty);/*pointe vers copie               
 extern BILENVTY concatty(BILENVTY bty1, BILENVTY bty2);/* retourne la concatenation*/
 extern void ecrire_bilenvty(BILENVTY bty); /* affiche la biliste de quadruplets  */
 /* affecte  la valeur rhs a la variable lhs                                      */
-extern void affectb(BILENVTY rho_gb, char *lhs, int rhs);                        
+extern void affectb(BILENVTY rho_gb, char *lhs, int rhs);
+/*---------------------fonctions --------------------------------------------*/
+extern LFON creer_fon(char *nfon, BILENVTY lparam,BILENVTY lvars,NOE com);   /* pointe vers cette fonction */
+extern NOE creer_noe(int codop, type typno, char* etiq, NOE fg, NOE fd);
+extern NOE copier_noe(NOE noe);      /* pointe vers une copie                */
+extern LFON copier_fon(LFON lfn);    /* pointe vers une copie                */
+extern void ecrire_fon(LFON bfn);
+extern LFON rechfon(char *chaine, LFON listident);/* retourne la position de chaine*/ 
+/*---------------------bilistes-de-fonctions --------------------------------*/
+extern BILFON bilfon_vide() ;                  /* retourne une biliste vide  */
+extern BILFON creer_bilfon(LFON pfon);  /* retourne une biliste a un element */
+extern BILFON copier_bilfon(BILFON bfn);/* pointe vers une copie             */
+extern BILFON concatfn(BILFON bfn1, BILFON bfn2);/* retourne la concatenation*/
+extern BILENVTY allvars(BILFON bfon);/*les variables de bfon (params puis varloc)*/
+extern void ecrire_bilfon(BILFON bfn);   /* affiche la biliste de fonctions  */
 /*---------------------programmes -----------------------------------------------*/
 void ecrire_prog(BILENVTY argby,NOE argno);/* affiche le programme  */
 /* --------------------CONSTANTES -----------------------------------------------*/
