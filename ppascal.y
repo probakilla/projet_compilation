@@ -209,6 +209,52 @@ int yyerror (char* s)
     return EXIT_FAILURE;
 }
 
+/**
+ * Est sensé verrifier si c'est typable, mais j'ai pas compris alors faut
+ * juste faire en sorte que ça renvoie 0 si ça l'est, et 1 si ça l'est pas 
+ **/
+static int typable (type t)
+{
+    // Wesh jé pa compri kek. Renvoie 0 si c'est typable, 1 si ça l'est pas.
+    return false;
+}
+
+/**
+ * @ret : renvoie 0 si tout les noeuds sont typables et un truc positif sinon.
+ * @param : L'arbre que l'ont veut évaluer.
+ * Cette fonction est sensé être appellée uniquement dans la fonction
+ * 'ana_synt_call' donc faut pas l'utiliser comme ça.
+ **/
+static int ana_synt (NOE n)
+{
+    int res = typable (n->typno);
+    // Si il a un fils droit ET un fils gauche, regarde si ils sont typables.
+    if (n->FD != NULL && n->FG != NULL)
+	return res + (ana_synt (n->FG) + ana_synt (n->FD));
+    // Si il a un fils droit uniquement.
+    if (n->FD != NULL && n->FG == NULL)
+	return res + (ana_synt (n->FD));
+    if (n->FD == NULL && n->FG != NULL)
+	return res + (ana_synt (n->FG));
+
+    // test si c'est une feuille.
+    if (n->FD == NULL && n->FG == NULL)
+	return res;
+}
+
+/**
+ * Simple fonction d'appel de 'ana_synt' elle agit en fonction du résultat 
+ * de cette dernière.
+ **/
+void ana_synt_call (NOE n)
+{
+    if (ana_synt (n) > 0)
+	yyerror ("Non typable");
+    else
+	printf ("typable");
+}
+
+
 
 int main (int argc, char* argv [])
 {
