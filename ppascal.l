@@ -42,8 +42,20 @@ do                         {return(Do);}
 "="                        {return(Eq);}
 "true"                     {return(True);}
 "false"                    {return(False);}
-"defun"                    {return(Def);}
-"defpro"                   {return(Dep);}
+defun\ {lettre}{caractere}*     {yylval.NO=Nalloc();
+                               (yylval.NO)->codop = NFon;
+			       (yylval.NO)->FG = NULL;
+			       (yylval.NO)->FD = NULL;
+			       (yylval.NO)->ETIQ = malloc(yyleng +1);//surement a modifier
+			       strcpy((yylval.NO)->ETIQ, yytext + 6);//+6 pour juste avoir le nom de la fonction
+                               return(NFon);}
+defpro\ {lettre}{caractere}*   {yylval.NO=Nalloc();
+                               (yylval.NO)->codop = NPro;
+			       (yylval.NO)->FG = NULL;
+			       (yylval.NO)->FD = NULL;
+			       (yylval.NO)->ETIQ = malloc(yyleng +1);//surement a modifier
+			       strcpy((yylval.NO)->ETIQ, yytext + 6);//+6 pour juste avoir le nom de la procédure
+                               return(NPro);}
 <INITIAL>{lettre}{caractere}* {yylval.NO=Nalloc();
                               (yylval.NO)->codop = V; /* variable (type inconnu) */
                               (yylval.NO)->FG = NULL;

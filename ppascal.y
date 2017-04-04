@@ -199,10 +199,10 @@ L_vartnn: 	Var Argt               {$$ = $2;}
 	| 	L_vartnn ',' Var Argt  {$$ = concatty ($1, $4);}
 	;
 		
-D_entp  : 	Dep NPro '(' L_argt ')'{$$ = creer_bilfon(creer_fon($2, $4, bilenvty_vide(), NULL));}
+D_entp  : 	Dep NPro '(' L_argt ')'{$$ = creer_bilfon(creer_fon($2->ETIQ, $4, bilenvty_vide(), NULL));}
         ;
 		
-D_entf  : 	Def NFon '(' L_argt ')' ':' TP {$$ = creer_bilfon(creer_fon($2, $4, bilenvty_vide(), Nalloc()));}
+D_entf  : 	Def NFon '(' L_argt ')' ':' TP {$$ = creer_bilfon(creer_fon($2->ETIQ, $4, bilenvty_vide(), Nalloc()));}
         ;
 		
 D       :	D_entp L_vart C  {$1.debut->VARLOC = $2;
