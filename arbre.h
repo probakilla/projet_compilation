@@ -4,7 +4,7 @@
 /* ----------------------------types--------------------------------------------*/
 
 /* type: tableau */
-typedef struct {
+typedef struct type{
   int DIM;   /* dimension ; vaut 0 ssi type de base                           */
   int TYPEF; /* type des cellules de plus petite dim: T_int ou T_com ou T_err */
 }type;

@@ -88,7 +88,7 @@ int semval(BILENVTY rho_gb,NOE e)
 	case NewAr:                     /*creation tableau */
 	  {
 	    int taille = semval (rho_gb, e->FD);
-	    res = padrl
+	    res = padrl;
 	    ADR[res] = ptasl;
 	    ptasl += taille;
 	    TAL[res] = taille;
