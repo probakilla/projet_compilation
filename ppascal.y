@@ -38,38 +38,38 @@ int yyerror (char *s);
 %nonassoc Eq lt Not
 %%
 
-MP      :	L_vart LD C {benvty = $1; syntree = $2; YYACCEPT;}
+MP      :	L_vart LD C {benvty = $1; syntree = $3; YYACCEPT;}
 		
 E       :	E Pl E      {$$ = Nalloc();
                              $$->codop = Pl;
-                             type_copy(&($$->typno),T_int);
+			     type_copy(&($$->typno), creer_type(0,T_int));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"+");}
 	| 	E Mo E      {$$ = Nalloc();
                              $$->codop = Mo;
-                             type_copy(&($$->typno),T_int);
+                             type_copy(&($$->typno), creer_type(0,T_int));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"-");}
 	| 	E Mu E      {$$ = Nalloc();
                              $$->codop = Mu;
+			     type_copy(&($$->typno), creer_type(0,T_int));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             type_copy(&($$->typno),T_int);
                              strcpy($$->ETIQ,"*");}
 	| 	E Or E      {$$ = Nalloc();
                              $$->codop = Or;
+			     type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             type_copy(&($$->typno),T_boo);
                              strcpy($$->ETIQ,"Or");}
 	| 	E Lt E      {$$ = Nalloc();
-                             type_copy(&($$->typno),T_boo);
+                             type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->codop = Lt;
                              $$->FG = $1;
                              $$->FD = $3;
@@ -77,21 +77,21 @@ E       :	E Pl E      {$$ = Nalloc();
                              strcpy($$->ETIQ,"Lt");}
 	| 	E Eq E      {$$ = Nalloc();
                              $$->codop = Eq;
+			     type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->FG = $1;
-                             type_copy(&($$->typno),T_boo);
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Eq");}
 	| 	E And E     {$$ = Nalloc();
                              $$->codop = And;
-                             type_copy(&($$->typno),T_boo);
+			     type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"And");}
 	| 	Not E       {$$ = Nalloc();
-                             type_copy(&($$->typno),T_boo);
                              $$->codop = Not;
+			     type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->FG = $2;
                              $$->FD = NULL;
                              $$->ETIQ = malloc(2);
@@ -101,8 +101,7 @@ E       :	E Pl E      {$$ = Nalloc();
 	| 	V           {$$ = $1;}
 	| 	True        {$$ = $1;}
 	| 	False       {$$ = $1;}
-	| 	V '(' L_args ')'     {$$ = Nalloc();
-                                      $$->codop = $1;} //onsépa
+| 	V '(' L_args ')'     {$$ = Nalloc();}//ONSÉPAS
 	| 	NewAr TP '[' E ']'   {$$ = Nalloc();
                                       $$->codop = NewAr;
                                       type_copy(&($$->typno),$2); /* DIM,TYPEF sont connus   */
@@ -124,6 +123,7 @@ Et      :       V '[' E ']'  {$$ = Nalloc();              /* un seul indice     
 	
 Ca      :	C Se Ca      {$$ = Nalloc();
                               $$->codop = Se;
+			      type_copy(&($$->typno), creer_type(0,T_com));
                               $$->FG = $1;
                               $$->FD = $3;
                               $$->ETIQ = malloc(2);
@@ -133,12 +133,14 @@ Ca      :	C Se Ca      {$$ = Nalloc();
 
 C       : 	Et Af E     {$$ = Nalloc();
                              $$->codop = Af;
+			     type_copy(&($$->typno), creer_type(0,T_com));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Af");}
 	| 	V Af E      {$$ = Nalloc();
                              $$->codop = Af;
+			     type_copy(&($$->typno), creer_type(0,T_com));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
@@ -147,6 +149,7 @@ C       : 	Et Af E     {$$ = Nalloc();
 	|   '{' C '}'             {$$ = $2;}
 	| 	If E Th C El Ca   {$$ = Nalloc();
                                    $$->codop = If;
+				   type_copy(&($$->typno), creer_type(0,T_com));
                                    $$->FG = $2;         /* condition     */
                                    $$->FD = Nalloc();   /* alternative   */
 			           $$->FD->ETIQ="";     /* champ inutile */
@@ -156,6 +159,7 @@ C       : 	Et Af E     {$$ = Nalloc();
                                    strcpy($$->ETIQ,"IfThEl");}
 	| 	Wh E Do Ca   {$$ = Nalloc();
                              $$->codop = Wh;
+			     type_copy(&($$->typno), creer_type(0,T_com));
                              $$->FG = $2;         /* condition d'entree dans le while */
                              $$->FD = $4;         /* corps du while                   */
                              $$->ETIQ = malloc(2);
@@ -195,7 +199,7 @@ L_vartnn: 	Var Argt               {$$ = $2;}
 	| 	L_vartnn ',' Var Argt  {$$ = concatty ($1, $4);}
 	;
 		
-D_entp  : 	Dep NPro '(' L_argt ')'{$$ = creer_bilfon(creer_fon($2, $4, NULL, NULL));}
+D_entp  : 	Dep NPro '(' L_argt ')'{$$ = creer_bilfon(creer_fon($2, $4, bilenvty_vide(), NULL));}
         ;
 		
 D_entf  : 	Def NFon '(' L_argt ')' ':' TP {$$ = creer_bilfon(creer_fon($2, $4, bilenvty_vide(), Nalloc()));}
