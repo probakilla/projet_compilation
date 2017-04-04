@@ -29,7 +29,7 @@ int yyerror (char *s);
 %type <TYP>    TP
 %type <LARGT>  Argt L_vart L_vartnn L_argt L_argtnn      
 			
-%token <NO>    Pl Mo Mu Or Lt Eq And Not I V true false NewAr Se Af Sk If Th El Wh Do Dep Def NPro NFon Var Ind Mp
+%token <NO>    Pl Mo Mu Or Lt Eq And Not I V True False NewAr Se Af Sk If Th El Wh Do Dep Def NPro NFon Var Ind Mp
 %token <TYP>   T_boo T_int T_ar T_err T_bot T_com
 %left And Or
 %left Pl Mo
@@ -90,8 +90,8 @@ E       :	E Pl E      {$$ = Nalloc();
 	|   '('	E ')'       {$$ = $2;}
 	| 	I           {$$ = $1;}
 	| 	V           {$$ = $1;}
-	| 	true        {$$ = $1;}
-	| 	false       {$$ = $1;}
+	| 	True        {$$ = $1;}
+	| 	False       {$$ = $1;}
 	| 	V '(' L_args ')'
 	| 	NewAr TP '[' E ']'   {$$ = Nalloc();
                                       $$->codop = NewAr;

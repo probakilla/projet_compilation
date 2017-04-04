@@ -40,6 +40,10 @@ do                         {return(Do);}
 "not"                      {return(Not);}
 "<"                        {return(Lt);}
 "="                        {return(Eq);}
+"true"                     {return(True);}
+"false"                    {return(False);}
+"defun"                    {return(Def);}
+"defpro"                   {return(Dep);}
 <INITIAL>{lettre}{caractere}* {yylval.NO=Nalloc();
                               (yylval.NO)->codop = V; /* variable (type inconnu) */
                               (yylval.NO)->FG = NULL;
@@ -69,4 +73,3 @@ do                         {return(Do);}
 
 int yywrap()
 {return(1);}
-
