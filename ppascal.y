@@ -230,7 +230,28 @@ int yyerror (char* s)
     return EXIT_FAILURE;
 }
 
+/*  pour tester l'analyse 
+int main(int argn, char **argv)
+{yyparse();
+  ecrire_prog(benvty,syntree);
+  return(1);
+}
+*/
+
+/*  pour tester l'interpreteur */
 int main (int argc, char* argv [])
 {
-    return EXIT_SUCCESS;
+  yyparse();
+  ecrire_prog(benvty, syntree);
+  init_memoire;
+  printf("Les variables globales avant exec:\n");
+  printf("------------------------:\n");
+  ecrire_bilenvty(benvty); printf("\n");
+  ecrire_memoire(5,5,20);
+  semop_gp(benvty,syntree);
+  printf("Les variables globales apres exec:\n");
+  printf("------------------------:\n");
+  ecrire_bilenvty(benvty); printf("\n");
+  ecrire_memoire(5,5,20);
+  return EXIT_SUCCESS;
 }
