@@ -16,6 +16,7 @@ int yyerror (char *s);
 /* ------------------VARIABLES GLOBALES -------------------------*/
   NOE syntree;          /* commande  globale                     */
   BILENVTY benvty;      /* environnement global                  */
+  BILFON bifon;         /* environnement fonction                */
   int ligcour=1;        /* ligne  courante                       */
   type tycour;          /* type courant                          */
   ENVTY vtycour;        /* var typee courante                    */
@@ -40,7 +41,7 @@ int yyerror (char *s);
 %nonassoc Eq lt Not*/
 %%
 
-MP      :	L_vart LD C {benvty = $1; syntree = $3; YYACCEPT;}
+MP      :	L_vart LD C {benvty = $1; bifon = $2; syntree = $3; YYACCEPT;}
 		
 E       :	E Pl E      {$$ = Nalloc();
                              $$->codop = Pl;
