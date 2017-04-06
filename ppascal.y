@@ -226,7 +226,7 @@ LD      :       %empty     {$$ = bilfon_vide();}
 
 int yyerror (char* s)
 {
-    fprintf (stderr, "%s error\n", s);
+  fprintf (stderr, "%s ligne %d \n", s, ligcour);
     return EXIT_FAILURE;
 }
 

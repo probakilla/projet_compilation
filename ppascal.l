@@ -26,6 +26,7 @@ skip                       {yylval.NO=Nalloc();
 new{sep}array{sep}of       {return(NewAr);}
 array{sep}of               {return(T_ar);}
 integer                    {type_copy(&(yylval.TYP),creer_type(0,T_int)); return(T_int);}
+boolean                    {type_copy(&(yylval.TYP), creer_type(0, T_boo)); return(T_boo);}
 if                         {return(If);}
 then                       {return(Th);}
 else                       {return(El);}
