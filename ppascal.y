@@ -32,10 +32,12 @@ int yyerror (char *s);
 			
 %token <NO>    Pl Mo Mu Or Lt Eq And Not I V True False NewAr Se Af Sk If Th El Wh Do Dep Def NPro NFon Var Ind Mp
 %token <TYP>   T_boo T_int T_ar T_err T_bot T_com
-%left And Or
+%left Se
+%left Pl Mo Mu And Or Not Lt Eq
+ /*%left And Or
 %left Pl Mo
 %left Mu
-%nonassoc Eq lt Not
+%nonassoc Eq lt Not*/
 %%
 
 MP      :	L_vart LD C {benvty = $1; syntree = $3; YYACCEPT;}
@@ -121,17 +123,17 @@ Et      :       V '[' E ']'  {$$ = Nalloc();              /* un seul indice     
 			      $$->FD = $3;}
         ;
 	
-Ca      :	C Se Ca      {$$ = Nalloc();
+C      :	C Se Ca      {$$ = Nalloc();
                               $$->codop = Se;
 			      type_copy(&($$->typno), creer_type(0,T_com));
                               $$->FG = $1;
                               $$->FD = $3;
                               $$->ETIQ = malloc(2);
                               strcpy($$->ETIQ,"Se");}
-        |       C            {$$ = $1;}
+        |       Ca            {$$ = $1;}
         ;
 
-C       : 	Et Af E     {$$ = Nalloc();
+Ca       : 	Et Af E     {$$ = Nalloc();
                              $$->codop = Af;
 			     type_copy(&($$->typno), creer_type(0,T_com));
                              $$->FG = $1;
