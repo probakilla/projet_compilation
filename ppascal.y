@@ -11,12 +11,14 @@
 #include <string.h>
 #include "arbre.h"
 #include "interp.h"
+#include "anasem.h"
 
 int yyerror (char *s);
 /* ------------------VARIABLES GLOBALES -------------------------*/
   NOE syntree;          /* commande  globale                     */
   BILENVTY benvty;      /* environnement global                  */
-  BILFON bifon;         /* environnement fonction                */
+  BILENVTY lenvty;      /* environnement local                   */
+  BILFON bifon;         /* environnement fonctions               */
   int ligcour=1;        /* ligne  courante                       */
   type tycour;          /* type courant                          */
   ENVTY vtycour;        /* var typee courante                    */
@@ -34,77 +36,82 @@ int yyerror (char *s);
 %token <NO>    Pl Mo Mu Or Lt Eq And Not I V True False NewAr Se Af Sk If Th El Wh Do Dep Def NPro NFon Var Ind Mp
 %token <TYP>   T_boo T_int T_ar T_err T_bot T_com
 %left Se
-%left Pl Mo Mu And Or Not Lt Eq
- /*%left And Or
+%left And Or Not Lt Eq
 %left Pl Mo
 %left Mu
-%nonassoc Eq lt Not*/
+
 %%
 
-MP      :	L_vart LD C {benvty = $1; bifon = $2; syntree = $3; YYACCEPT;}
+MP      :	L_vart LD C { benvty = $1; bifon = $2; syntree = $3; YYACCEPT;}
 		
 E       :	E Pl E      {$$ = Nalloc();
                              $$->codop = Pl;
-			     type_copy(&($$->typno), creer_type(0,T_int));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"+");}
+                             strcpy($$->ETIQ,"+");
+                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	E Mo E      {$$ = Nalloc();
                              $$->codop = Mo;
-                             type_copy(&($$->typno), creer_type(0,T_int));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"-");}
+                             strcpy($$->ETIQ,"-");
+                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	E Mu E      {$$ = Nalloc();
                              $$->codop = Mu;
-			     type_copy(&($$->typno), creer_type(0,T_int));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"*");}
+                             strcpy($$->ETIQ,"*");
+                             $$->typno = calcul_type(benvty, $$ , ligcour);}
 	| 	E Or E      {$$ = Nalloc();
                              $$->codop = Or;
-			     type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"Or");}
+                             strcpy($$->ETIQ,"Or");
+                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	E Lt E      {$$ = Nalloc();
-                             type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->codop = Lt;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"Lt");}
+                             strcpy($$->ETIQ,"Lt");
+                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	E Eq E      {$$ = Nalloc();
                              $$->codop = Eq;
-			     type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"Eq");}
+                             strcpy($$->ETIQ,"Eq");
+                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	E And E     {$$ = Nalloc();
                              $$->codop = And;
-			     type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"And");}
+                             strcpy($$->ETIQ,"And");
+                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	Not E       {$$ = Nalloc();
                              $$->codop = Not;
-			     type_copy(&($$->typno), creer_type(0,T_boo));
                              $$->FG = $2;
                              $$->FD = NULL;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"Not");}
+                             strcpy($$->ETIQ,"Not");
+			     // $$->typno = calcul_type(benvty, $$ , ligcour);
+			     }
 	|   '('	E ')'       {$$ = $2;}
 	| 	I           {$$ = $1;}
 	| 	V           {$$ = $1;}
 	| 	True        {$$ = $1;}
 	| 	False       {$$ = $1;}
-| 	V '(' L_args ')'     {$$ = Nalloc();}//ONSÉPAS
+        | 	V '(' L_args ')'     {$$ = Nalloc();
+                                      $$->codop = NFon;
+				      $$->ETIQ = Idalloc();
+				      strcpy($$->ETIQ, $1->ETIQ);
+				      $$->FG = $3;
+				      $$->FD = NULL;}
 	| 	NewAr TP '[' E ']'   {$$ = Nalloc();
                                       $$->codop = NewAr;
                                       type_copy(&($$->typno),$2); /* DIM,TYPEF sont connus   */
@@ -117,66 +124,79 @@ E       :	E Pl E      {$$ = Nalloc();
 Et      :       V '[' E ']'  {$$ = Nalloc();              /* un seul indice                   */
                               $$->codop = Ind;
 			      $$->FG = $1;
-			      $$->FD = $3;}
+			      $$->FD = $3;
+                              /*$1->typno = calcul_type(benvty, $1 , ligcour);
+                              $$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	Et '[' E ']' {$$ = Nalloc();             /* plusieurs indices                */
                               $$->codop = Ind;
 			      $$->FG = $1;
-			      $$->FD = $3;}
+			      $$->FD = $3;
+			      /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
         ;
 	
 C      :	C Se Ca      {$$ = Nalloc();
                               $$->codop = Se;
-			      type_copy(&($$->typno), creer_type(0,T_com));
                               $$->FG = $1;
                               $$->FD = $3;
                               $$->ETIQ = malloc(2);
-                              strcpy($$->ETIQ,"Se");}
+                              strcpy($$->ETIQ,"Se");
+			      /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
         |       Ca            {$$ = $1;}
         ;
 
 Ca       : 	Et Af E     {$$ = Nalloc();
                              $$->codop = Af;
-			     type_copy(&($$->typno), creer_type(0,T_com));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"Af");}
+                             strcpy($$->ETIQ,"Af");
+			     /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	V Af E      {$$ = Nalloc();
                              $$->codop = Af;
-			     type_copy(&($$->typno), creer_type(0,T_com));
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"Af");}
+                             strcpy($$->ETIQ,"Af");
+			     /*$1->typno = calcul_type(benvty, $1 , ligcour);
+			       $$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	Sk                {$$ = $1;}
 	|   '{' C '}'             {$$ = $2;}
 	| 	If E Th C El Ca   {$$ = Nalloc();
                                    $$->codop = If;
-				   type_copy(&($$->typno), creer_type(0,T_com));
                                    $$->FG = $2;         /* condition     */
                                    $$->FD = Nalloc();   /* alternative   */
 			           $$->FD->ETIQ="";     /* champ inutile */
 			           $$->FD->FG = $4;     /* branche true  */
 			           $$->FD->FD = $6;     /* branche false */
                                    $$->ETIQ = malloc(2);
-                                   strcpy($$->ETIQ,"IfThEl");}
+                                   strcpy($$->ETIQ,"IfThEl");
+				   /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
 	| 	Wh E Do Ca   {$$ = Nalloc();
                              $$->codop = Wh;
 			     type_copy(&($$->typno), creer_type(0,T_com));
                              $$->FG = $2;         /* condition d'entree dans le while */
                              $$->FD = $4;         /* corps du while                   */
                              $$->ETIQ = malloc(2);
-                             strcpy($$->ETIQ,"Wh");}
-	| 	V '(' L_args ')' 
+                             strcpy($$->ETIQ,"Wh");
+			     /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+	| 	V '(' L_args ')' {$$ = Nalloc();
+                                  $$->codop = NFon;
+				  $$->ETIQ = Idalloc();
+				  strcpy($$->ETIQ, $1->ETIQ);
+				  $$->FG = $3;
+				  $$->FD = NULL;}
         ;
 
-L_args  :       %empty      {$$ = Nalloc();}
+L_args  :       %empty      {$$ = NULL;}
 	| 	L_argsnn    {$$ = $1;}
         ;
 		
 L_argsnn: 	E               {$$ = $1;}
-	| 	E ',' L_argsnn  {;} // a todo
-	;
+        |  	E ',' L_argsnn  {$$ = Nalloc();
+                                 $$->codop = 0; // je ne sais pas
+				 $$->FG = $1;
+		                 $$->FD = $3;}//voir si on inverse pas FG et FD
+        ;
 			
 L_argt  :       %empty      {$$ = bilenvty_vide ();}
 	| 	L_argtnn    {$$ = $1;}
@@ -189,9 +209,9 @@ L_argtnn: 	Argt               {$$ = $1;}
 Argt    :	V ':' TP    {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
         ;
 		
-TP      :	T_boo       {$$ = $1;}
-	| 	T_int       {$$ = $1;}
-	| 	T_ar TP     {$$ = $2; $$.DIM++;}
+TP      :	T_boo       {type_copy(&$$, creer_type(0, T_boo));}
+        |  	T_int       {type_copy(&$$, creer_type(0, T_int));}
+        | 	T_ar TP     {type_copy(&$$, $2), $$.DIM++;}
         ;
 		
 L_vart  :       %empty      {$$ = bilenvty_vide();}
@@ -202,22 +222,22 @@ L_vartnn: 	Var Argt               {$$ = $2;}
 	| 	L_vartnn ',' Var Argt  {$$ = concatty ($1, $4);}
 	;
 		
-D_entp  : 	Dep NPro '(' L_argt ')'{$$ = creer_bilfon(creer_fon($2->ETIQ, $4, bilenvty_vide(), NULL));}
+D_entp  : 	Dep V '(' L_argt ')'  {$$ = creer_bilfon(creer_fon($2->ETIQ, $4, bilenvty_vide(), NULL, creer_type(0, T_bot)));}
         ;
 		
-D_entf  : 	Def NFon '(' L_argt ')' ':' TP {$$ = creer_bilfon(creer_fon($2->ETIQ, $4, bilenvty_vide(), Nalloc()));}
+D_entf  : 	Def V '(' L_argt ')' ':' TP {$$ = creer_bilfon(creer_fon($2->ETIQ, $4, bilenvty_vide(), NULL, $7));}
         ;
 		
-D       :	D_entp L_vart C  {$1.debut->VARLOC = $2;
-                                  $1.debut->CORPS = $3;
+D       :	D_entp L_vart C  {$1.debut->VARLOC = copier_bilenvty($2);
+                                  $1.debut->CORPS = copier_noe($3);
                                   $$ = $1;}
-        | 	D_entf L_vart C  {$1.debut->VARLOC = $2;
-                                  $1.debut->CORPS = $3;
+        | 	D_entf L_vart C  {$1.debut->VARLOC = copier_bilenvty($2);
+                                  $1.debut->CORPS = copier_noe($3);
                                   $$ = $1;}
         ;
 		
 LD      :       %empty     {$$ = bilfon_vide();}
-        |	LD D       {$$ = concatfn($1, $2);}
+|	LD D       {$$ = concatfn($1, $2);}
         ;
 		
 %%
@@ -232,26 +252,41 @@ int yyerror (char* s)
 
 /*  pour tester l'analyse 
 int main(int argn, char **argv)
-{yyparse();
-  ecrire_prog(benvty,syntree);
+{
+  yyparse();
+  ecrire_prog(bifon, benvty,syntree);
   return(1);
-}
-*/
+  }*/
 
-/*  pour tester l'interpreteur */
+				       /*  pour tester l'interpreteur */
 int main (int argc, char* argv [])
 {
   yyparse();
-  ecrire_prog(benvty, syntree);
+  ecrire_prog(bifon, benvty, syntree);
+  type terr=creer_type(0,T_err);
+  type tcom= creer_type(0,T_com);
+  /*if (type_eq(syntree->typno,terr))
+    {
+      printf("erreur de typage\n");
+      return EXIT_FAILURE;
+    }
+  else if (type_eq(syntree->typno,tcom))
+    printf("programme bien type\n");
+  else
+    {
+    printf("attention: typage incomplet\n");
+    return EXIT_FAILURE;
+    }*/
   init_memoire;
   printf("Les variables globales avant exec:\n");
   printf("------------------------:\n");
   ecrire_bilenvty(benvty); printf("\n");
   ecrire_memoire(5,5,20);
-  semop_gp(benvty,syntree);
+  semop_gp(bifon, lenvty, benvty, syntree);
   printf("Les variables globales apres exec:\n");
   printf("------------------------:\n");
   ecrire_bilenvty(benvty); printf("\n");
   ecrire_memoire(5,5,20);
   return EXIT_SUCCESS;
 }
+

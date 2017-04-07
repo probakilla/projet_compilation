@@ -2,13 +2,13 @@ all : ppascal
 
 lex.yy.c: ppascal.l
 	flex ppascal.l
-	mv lex.yy.c yy.lex.c
+	cp lex.yy.c yy.lex.c
 
 ppascal.tab.c ppascal.tab.h: lex.yy.c
-	yacc -b ppascal -d ppascal.y
+	yacc -r state -b ppascal -d ppascal.y
 
-ppascal: arbre.c interp.c ppascal.tab.c
-	gcc -o ppascal ppascal.tab.c arbre.c interp.c
+ppascal: arbre.c interp.c anasem.c ppascal.tab.c
+	gcc -g -o ppascal ppascal.tab.c anasem.c arbre.c interp.c
 
 clean:
 	rm -f *.tab.*

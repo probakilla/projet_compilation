@@ -97,7 +97,7 @@ ENVTY copier_envty(ENVTY env)
       ety= Envtalloc();
       if (env->ID!=NULL)
 	{ety->ID=Idalloc();
-	  strcpy(ety->ID,env->ID);}
+	 strcpy(ety->ID,env->ID);}
       type_copy(&(ety->TYPE),env->TYPE);
       ety->VAL=env->VAL;
       ety->SUIV= copier_envty(env->SUIV);
@@ -281,25 +281,28 @@ BILENVTY copier_bilenvty(BILENVTY bty)
   while(ctycour && ctycour->SUIV)
     ctycour=ctycour->SUIV;
   bcty.fin=ctycour;
+ 
   return(bcty);
 }
 
 /* retourne la concatenation                       */
 /* copie les deux arguments: pas de factorisation  */
 BILENVTY concatty(BILENVTY bty1, BILENVTY bty2)
-{BILENVTY bty,nbty1,nbty2;
+{BILENVTY bty,nbty1,nbty2;  
   nbty1=copier_bilenvty(bty1);
   nbty2=copier_bilenvty(bty2);
   if (nbty1.fin!= NULL)
     if (nbty2.debut!=NULL)
-      { nbty1.fin->SUIV=nbty2.debut;
+      {
+	nbty1.fin->SUIV=nbty2.debut;
         bty.debut=nbty1.debut;
         bty.fin=nbty2.fin;
+	
         return(bty);}
     else
-      return(nbty1);  
-  else
-    return(nbty2);
+      return(nbty1);
+      else
+	  return(nbty2);
 }
 
 /* affiche la biliste de variables typees */
@@ -317,11 +320,11 @@ void affectb(BILENVTY rho_gb, char *lhs, int rhs)
     printf("erreur: variable %s non declaree", lhs);
 }
 
-LFON creer_fon(char *nfon, BILENVTY lparam,BILENVTY lvars,NOE com)
+LFON creer_fon(char *nfon, BILENVTY lparam,BILENVTY lvars,NOE com, type retour)
 {
   LFON fon = Lfonalloc();
   if(nfon != NULL)
-    {
+    { 
       fon->ID = Idalloc();
       strcpy(fon->ID, nfon);
     }
@@ -329,6 +332,7 @@ LFON creer_fon(char *nfon, BILENVTY lparam,BILENVTY lvars,NOE com)
   fon->VARLOC = lvars;
   fon->CORPS = com;
   fon->SUIV = NULL;
+  type_copy(&fon->TYPRET, retour);
 }
 
 NOE creer_noe(int codop, type typno, char* etiq, NOE fg, NOE fd)
@@ -380,6 +384,7 @@ LFON copier_fon(LFON lfn)
       copy->VARLOC = copier_bilenvty(lfn->VARLOC);
       copy->CORPS = copier_noe(lfn->CORPS);
       copy->SUIV = copier_fon(lfn->SUIV);
+      type_copy(&(copy->TYPRET), lfn->TYPRET);
     }
   return copy;
 }
@@ -391,16 +396,14 @@ void ecrire_fon(LFON bfn)
   else
     {
       printf("Nom de la fonction: %s\n", bfn->ID);
-      printf("Paramètre de la fonction:\n");
-      printf("------------------------:\n");
+      printf("  Paramètre de la fonction:\n");
       ecrire_bilenvty(bfn->PARAM);
       printf("Les variables locales:\n");
-      printf("------------------------:\n");
       ecrire_bilenvty(bfn->VARLOC);
-      printf("Corps de la fonction:\n");
-      printf("------------------------:\n");
+      printf("  Corps de la fonction:\n");
       prefix(bfn->CORPS);
-      
+      printf("  Type de retour\n");
+      ecrire_type(bfn->TYPRET);
     }
 }
 
@@ -453,7 +456,7 @@ BILFON concatfn(BILFON bfn1, BILFON bfn2)
   nbfn1 = copier_bilfon(bfn1);
   nbfn2 = copier_bilfon(bfn2);
   if (nbfn1.fin !=NULL)
-    if (nbfn2.fin !=NULL)
+    if (nbfn2.debut !=NULL)
       {
 	nbfn1.fin->SUIV = nbfn2.debut;
 	bfn.debut = nbfn1.debut;
@@ -478,10 +481,13 @@ void ecrire_bilfon(BILFON bfn)
 }
 /*-------------------------------------------------------------------------------*/
 /*---------------------programmes -----------------------------------------------*/
-void ecrire_prog(BILENVTY argby,NOE argno)
+void ecrire_prog(BILFON lfon, BILENVTY argby,NOE argno)
 {printf("Les variables globales:\n");
   printf("------------------------:\n");
   ecrire_bilenvty(argby);printf("\n");
+  printf("Les fonctions:\n");
+  printf("------------------------:\n");
+  ecrire_bilfon(lfon);printf("\n");
   printf("Le programme principal:\n");
   printf("------------------------:\n");
   prefix(argno);printf("\n");

@@ -19,14 +19,14 @@ skip                       {yylval.NO=Nalloc();
                            tycour=creer_type(0,T_com);
                            (yylval.NO)->FG = NULL;
                            (yylval.NO)->FD = NULL;
-                           (yylval.NO)->ETIQ = malloc(yyleng + 1);
+                           (yylval.NO)->ETIQ = Idalloc();
                            strcpy((yylval.NO)->ETIQ,yytext);
                            type_copy(&((yylval.NO)->typno),creer_type(0,T_com));
                            return(Sk);}
 new{sep}array{sep}of       {return(NewAr);}
 array{sep}of               {return(T_ar);}
-integer                    {type_copy(&(yylval.TYP),creer_type(0,T_int)); return(T_int);}
-boolean                    {type_copy(&(yylval.TYP), creer_type(0, T_boo)); return(T_boo);}
+integer                    {return(T_int);}
+boolean                    {return(T_boo);}
 if                         {return(If);}
 then                       {return(Th);}
 else                       {return(El);}
@@ -43,26 +43,14 @@ do                         {return(Do);}
 "="                        {return(Eq);}
 "true"                     {return(True);}
 "false"                    {return(False);}
-defun\ {lettre}{caractere}*     {yylval.NO=Nalloc();
-                               (yylval.NO)->codop = NFon;
-			       (yylval.NO)->FG = NULL;
-			       (yylval.NO)->FD = NULL;
-			       (yylval.NO)->ETIQ = malloc(yyleng +1);//surement a modifier
-			       strcpy((yylval.NO)->ETIQ, yytext + 6);//+6 pour juste avoir le nom de la fonction
-                               return(NFon);}
-defpro\ {lettre}{caractere}*   {yylval.NO=Nalloc();
-                               (yylval.NO)->codop = NPro;
-			       (yylval.NO)->FG = NULL;
-			       (yylval.NO)->FD = NULL;
-			       (yylval.NO)->ETIQ = malloc(yyleng +1);//surement a modifier
-			       strcpy((yylval.NO)->ETIQ, yytext + 6);//+6 pour juste avoir le nom de la procédure
-                               return(NPro);}
+"defun"                      {return(Def);}
+"defpro"                     {return(Dep);}
 <INITIAL>{lettre}{caractere}* {yylval.NO=Nalloc();
                               (yylval.NO)->codop = V; /* variable (type inconnu) */
                               (yylval.NO)->FG = NULL;
                               (yylval.NO)->FD = NULL;
-                              (yylval.NO)->ETIQ = malloc(yyleng + 1);
-                              strcpy((yylval.NO)->ETIQ,yytext);
+                              (yylval.NO)->ETIQ = Idalloc();
+                              strcpy((yylval.NO)->ETIQ, yytext);
                               return(V);}       /* variable                     */
 0|[1-9][0-9]*              {yylval.NO=Nalloc(); /*entier positif; AF:cas negatif*/
                            (yylval.NO)->codop = I;  /* entier                   */
@@ -75,7 +63,6 @@ defpro\ {lettre}{caractere}*   {yylval.NO=Nalloc();
                            (yylval.NO)->ETIQ = malloc(yyleng + 1);
                            strcpy((yylval.NO)->ETIQ,yytext);
                            printf("analyse lex, ETIQ :%s \n",(yylval.NO)->ETIQ);
-                           (yylval.NO)->codop = I;
                            return(I);}          /* entier                      */
 :=                         {return(Af);}
 ";"                        {return(Se);}

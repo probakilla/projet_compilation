@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "arbre.h"
-#include "pppascal.tab.h"
+#include "ppascal.tab.h"
 /*------------------FONCTIONS ---------------------------------------------------*/
 /*------------------types--------------------------------------------------------*/
 
@@ -31,10 +31,10 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	  return(tp);}
       /* e != NULL et tous les fils sont bien-types */
       switch(e->codop)
-	{case true:
+	{case True:
 	    tp=e->typno;
 	    return(tp);/* typno deja affecte     */
-	case false:
+	case False:
 	  tp=e->typno;
 	  return(tp);/* typno deja affecte     */
 	case Ind: /* (tab_dim k of tau) x   int -> (tab_dim k-1 of tau) */
@@ -43,10 +43,10 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	    tint=creer_type(0,T_int);
 	    tfg=e->FG->typno;
 	    tfd=e->FD->typno;
-	    if(e->FD->typno->DIM == 0 && e->FG->typno->DIM >= 1)
+	    if(e->FD->typno.DIM == 0 && e->FG->typno.DIM >= 1)
 	      if (type_eq(tfd, tint))
 		{
-		  e->FG->typno->DIM --;
+		  e->FG->typno.DIM --;
 		  type_copy(&tp,tfd);
 		  type_copy(&(e->typno),tfd);
 		}

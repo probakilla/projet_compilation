@@ -28,12 +28,13 @@ typedef struct bilenvty{
   ENVTY debut;
   ENVTY fin;}BILENVTY;
 
-/* listefonctions := liste de 4-tuples (ident, BILparametres, BILvarloc, ast) */
+/* listefonctions := liste de 5-tuples (ident, BILparametres, BILvarloc, ast, typeRetour) */
 typedef struct cellfon{
   char *ID;
   BILENVTY PARAM;    /* pametres formels  */
   BILENVTY VARLOC;   /* variables locales */
   NOE CORPS;
+  type TYPRET;       /*type de retour (T_bot dans le cas d'une procédure)*/
   struct cellfon *SUIV;} *LFON;
 
 /* biliste de fonctions */
@@ -48,7 +49,7 @@ extern int yylex();          /* fonction generee par flex                       
 extern int yyerror();        /* fonction generee par flex/bison                  */
 /*---------------------allocation memoire----------------------------------------*/
 extern char *Idalloc();      /* retourne un tableau de MAXIDENT char             */
-extern NOE Nalloc();         /* retourne un NOE                                  */
+extern NOE Nalloc();         /* retourne un NOE                                 */
 extern ENVTY Envtalloc();    /* retourne un ENVTY                                */
 extern type *talloc();       /* retourne un pointeur sur type *                  */
 extern LFON  Lfonalloc();    /* retourne un LFON                                 */
@@ -79,7 +80,7 @@ extern void ecrire_bilenvty(BILENVTY bty); /* affiche la biliste de quadruplets 
 /* affecte  la valeur rhs a la variable lhs                                      */
 extern void affectb(BILENVTY rho_gb, char *lhs, int rhs);
 /*---------------------fonctions --------------------------------------------*/
-extern LFON creer_fon(char *nfon, BILENVTY lparam, BILENVTY lvars,NOE com);  /* pointe vers cette fonction */
+extern LFON creer_fon(char *nfon, BILENVTY lparam, BILENVTY lvars,NOE com, type retour);  /* pointe vers cette fonction */
 extern NOE creer_noe(int codop, type typno, char* etiq, NOE fg, NOE fd);
 extern NOE copier_noe(NOE noe);      /* pointe vers une copie                */
 extern LFON copier_fon(LFON lfn);    /* pointe vers une copie                */
@@ -93,7 +94,7 @@ extern BILFON concatfn(BILFON bfn1, BILFON bfn2);/* retourne la concatenation*/
 extern BILENVTY allvars(BILFON bfon);/*les variables de bfon (params puis varloc)*/
 extern void ecrire_bilfon(BILFON bfn);   /* affiche la biliste de fonctions  */
 /*---------------------programmes -----------------------------------------------*/
-void ecrire_prog(BILENVTY argby,NOE argno);/* affiche le programme  */
+void ecrire_prog(BILFON Lfon, BILENVTY argby,NOE argno);/* affiche le programme  */
 /* --------------------CONSTANTES -----------------------------------------------*/
 #define MAXIDENT 16          /* long max d'un identificateur de variable         */
 #define TAILLEADR 1000       /* nbe max adresses dans le tas                     */
