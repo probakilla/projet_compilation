@@ -50,56 +50,56 @@ E       :	E Pl E      {$$ = Nalloc();
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"+");
-                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+                             calcul_type(benvty, $$ , ligcour);}
 	| 	E Mo E      {$$ = Nalloc();
                              $$->codop = Mo;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"-");
-                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+                             calcul_type(benvty, $$ , ligcour);}
 	| 	E Mu E      {$$ = Nalloc();
                              $$->codop = Mu;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"*");
-                             $$->typno = calcul_type(benvty, $$ , ligcour);}
+                             calcul_type(benvty, $$ , ligcour);}
 	| 	E Or E      {$$ = Nalloc();
                              $$->codop = Or;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Or");
-                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+                             calcul_type(benvty, $$ , ligcour);}
 	| 	E Lt E      {$$ = Nalloc();
                              $$->codop = Lt;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Lt");
-                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+                             calcul_type(benvty, $$ , ligcour);}
 	| 	E Eq E      {$$ = Nalloc();
                              $$->codop = Eq;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Eq");
-                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+                             calcul_type(benvty, $$ , ligcour);}
 	| 	E And E     {$$ = Nalloc();
                              $$->codop = And;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"And");
-                             /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+                             calcul_type(benvty, $$ , ligcour);}
 	| 	Not E       {$$ = Nalloc();
                              $$->codop = Not;
                              $$->FG = $2;
                              $$->FD = NULL;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Not");
-			     // $$->typno = calcul_type(benvty, $$ , ligcour);
+			     calcul_type(benvty, $$ , ligcour);
 			     }
 	|   '('	E ')'       {$$ = $2;}
 	| 	I           {$$ = $1;}
@@ -125,13 +125,13 @@ Et      :       V '[' E ']'  {$$ = Nalloc();              /* un seul indice     
                               $$->codop = Ind;
 			      $$->FG = $1;
 			      $$->FD = $3;
-                              /*$1->typno = calcul_type(benvty, $1 , ligcour);
-                              $$->typno = calcul_type(benvty, $$ , ligcour);*/}
+                              calcul_type(benvty, $1 , ligcour);
+                              calcul_type(benvty, $$ , ligcour);}
 	| 	Et '[' E ']' {$$ = Nalloc();             /* plusieurs indices                */
                               $$->codop = Ind;
 			      $$->FG = $1;
 			      $$->FD = $3;
-			      /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+			      calcul_type(benvty, $$ , ligcour);}
         ;
 	
 C      :	C Se Ca      {$$ = Nalloc();
@@ -140,7 +140,7 @@ C      :	C Se Ca      {$$ = Nalloc();
                               $$->FD = $3;
                               $$->ETIQ = malloc(2);
                               strcpy($$->ETIQ,"Se");
-			      /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+			      calcul_type(benvty, $$ , ligcour);}
         |       Ca            {$$ = $1;}
         ;
 
@@ -150,15 +150,15 @@ Ca       : 	Et Af E     {$$ = Nalloc();
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Af");
-			     /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+			     calcul_type(benvty, $$ , ligcour);}
 	| 	V Af E      {$$ = Nalloc();
                              $$->codop = Af;
                              $$->FG = $1;
                              $$->FD = $3;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Af");
-			     /*$1->typno = calcul_type(benvty, $1 , ligcour);
-			       $$->typno = calcul_type(benvty, $$ , ligcour);*/}
+			     calcul_type(benvty, $1 , ligcour);
+			     calcul_type(benvty, $$ , ligcour);}
 	| 	Sk                {$$ = $1;}
 	|   '{' C '}'             {$$ = $2;}
 	| 	If E Th C El Ca   {$$ = Nalloc();
@@ -170,7 +170,7 @@ Ca       : 	Et Af E     {$$ = Nalloc();
 			           $$->FD->FD = $6;     /* branche false */
                                    $$->ETIQ = malloc(2);
                                    strcpy($$->ETIQ,"IfThEl");
-				   /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+				   calcul_type(benvty, $$ , ligcour);}
 	| 	Wh E Do Ca   {$$ = Nalloc();
                              $$->codop = Wh;
 			     type_copy(&($$->typno), creer_type(0,T_com));
@@ -178,7 +178,7 @@ Ca       : 	Et Af E     {$$ = Nalloc();
                              $$->FD = $4;         /* corps du while                   */
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Wh");
-			     /*$$->typno = calcul_type(benvty, $$ , ligcour);*/}
+			     calcul_type(benvty, $$ , ligcour);}
 	| 	V '(' L_args ')' {$$ = Nalloc();
                                   $$->codop = NFon;
 				  $$->ETIQ = Idalloc();
@@ -206,7 +206,7 @@ L_argtnn: 	Argt               {$$ = $1;}
 	| 	L_argtnn ',' Argt  {$$ = concatty ($1, $3);}
 	;
 			
-Argt    :	V ':' TP    {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
+Argt    :	V ':' TP    {vtycour = creer_envty($1->ETIQ, $3, 0);}// {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
         ;
 		
 TP      :	T_boo       {type_copy(&$$, creer_type(0, T_boo));}
@@ -214,8 +214,8 @@ TP      :	T_boo       {type_copy(&$$, creer_type(0, T_boo));}
         | 	T_ar TP     {type_copy(&$$, $2), $$.DIM++;}
         ;
 		
-L_vart  :       %empty      {$$ = bilenvty_vide();}
-	| 	L_vartnn    {$$ = $1;}
+L_vart  :       %empty      {$$ = bilenvty_vide(); benvty = $$;}
+	| 	L_vartnn    {$$ = $1; benvty = $$;}
         ;
 		
 L_vartnn: 	Var Argt               {$$ = $2;}
