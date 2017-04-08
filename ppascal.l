@@ -1,5 +1,7 @@
 %{
   extern int ligcour;
+  enum {declareVariable, declareFonction, declareProcedure};
+  int declare = declareVariable;
 %}
 
 %x COMMENT  
@@ -43,15 +45,32 @@ do                         {return(Do);}
 "="                        {return(Eq);}
 "true"                     {return(True);}
 "false"                    {return(False);}
-"defun"                      {return(Def);}
-"defpro"                     {return(Dep);}
+"defun"                      {declare = declareFonction; return(Def);}
+"defpro"                     {declare = declareProcedure; return(Dep);}
 <INITIAL>{lettre}{caractere}* {yylval.NO=Nalloc();
-                              (yylval.NO)->codop = V; /* variable (type inconnu) */
-                              (yylval.NO)->FG = NULL;
-                              (yylval.NO)->FD = NULL;
-                              (yylval.NO)->ETIQ = Idalloc();
-                              strcpy((yylval.NO)->ETIQ, yytext);
-                              return(V);}       /* variable                     */
+                               (yylval.NO)->ETIQ = Idalloc();
+			       strcpy((yylval.NO)->ETIQ, yytext);
+                               if (declare == declareVariable)
+				 {
+				   (yylval.NO)->codop = V; /* variable (type inconnu) */
+				   (yylval.NO)->FG = NULL;
+				   (yylval.NO)->FD = NULL;
+				   return(V);}       /* variable                     */
+			       else if (declare == declareFonction)
+				 {
+				   (yylval.NO)->codop = NFon; /* Nom de fonction     */
+				   declare = declareVariable;
+				   (yylval.NO)->FG = NULL;
+				   (yylval.NO)->FD = NULL;
+				   return(NFon);}
+			       else if (declare == declareProcedure)
+				 {
+				   (yylval.NO)->codop = NPro; /* Nom de procédure     */
+				   declare = declareVariable;
+				   (yylval.NO)->FG = NULL;
+				   (yylval.NO)->FD = NULL;
+				   return(NPro);}
+				 }
 0|[1-9][0-9]*              {yylval.NO=Nalloc(); /*entier positif; AF:cas negatif*/
                            (yylval.NO)->codop = I;  /* entier                   */
                            printf("analyse lex, token I,l1 \n");

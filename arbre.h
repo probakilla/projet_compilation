@@ -80,7 +80,6 @@ extern void ecrire_bilenvty(BILENVTY bty); /* affiche la biliste de quadruplets 
 /* affecte  la valeur rhs a la variable lhs                                      */
 extern void affectb(BILENVTY rho_gb, char *lhs, int rhs);
 /*---------------------fonctions --------------------------------------------*/
-extern LFON creer_fon(char *nfon, BILENVTY lparam, BILENVTY lvars,NOE com, type retour);  /* pointe vers cette fonction */
 extern NOE creer_noe(int codop, type typno, char* etiq, NOE fg, NOE fd);
 extern NOE copier_noe(NOE noe);      /* pointe vers une copie                */
 extern LFON copier_fon(LFON lfn);    /* pointe vers une copie                */

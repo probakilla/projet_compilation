@@ -296,10 +296,6 @@ void inbilenvty(BILENVTY *prho,char *var,type tvar)
       newcell->SUIV=erho;
       prho->debut=newcell;
     }
-  else
-    {
-      /*TODO: tester coherence du type */
-    }
 }
 
 /* retourne une biliste vide  */
@@ -362,21 +358,6 @@ void affectb(BILENVTY rho_gb, char *lhs, int rhs)
     pos->VAL=rhs;                   /* lhs est une var enregistree           */
   else
     printf("erreur: variable %s non declaree", lhs);
-}
-
-LFON creer_fon(char *nfon, BILENVTY lparam,BILENVTY lvars,NOE com, type retour)
-{
-  LFON fon = Lfonalloc();
-  if(nfon != NULL)
-    { 
-      fon->ID = Idalloc();
-      strcpy(fon->ID, nfon);
-    }
-  fon->PARAM = lparam;
-  fon->VARLOC = lvars;
-  fon->CORPS = com;
-  fon->SUIV = NULL;
-  type_copy(&fon->TYPRET, retour);
 }
 
 NOE creer_noe(int codop, type typno, char* etiq, NOE fg, NOE fd)
