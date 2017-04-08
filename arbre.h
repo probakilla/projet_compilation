@@ -95,6 +95,13 @@ extern BILENVTY allvars(BILFON bfon);/*les variables de bfon (params puis varloc
 extern void ecrire_bilfon(BILFON bfn);   /* affiche la biliste de fonctions  */
 /*---------------------programmes -----------------------------------------------*/
 void ecrire_prog(BILFON Lfon, BILENVTY argby,NOE argno);/* affiche le programme  */
+/* ---------------LIBERE! DELIVRE! (LIBERATION DE LA MEMOIRE) -------------------*/
+extern void freeNOE(NOE n);
+extern void freeENV(ENVTY env);
+extern void freeType(type t);
+extern void freeLFON(LFON l);
+extern void freeBILE(BILENVTY b);
+extern void freeBILF(BILFON b);
 /* --------------------CONSTANTES -----------------------------------------------*/
 #define MAXIDENT 16          /* long max d'un identificateur de variable         */
 #define TAILLEADR 1000       /* nbe max adresses dans le tas                     */

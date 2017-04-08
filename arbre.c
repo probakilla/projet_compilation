@@ -33,8 +33,52 @@ LFON Lfonalloc()
   return((LFON)malloc(sizeof(struct cellfon)));
 }
 /*-------------------------------------------------------------------*/
-/*---------------------parcours d'arbres-----------------------------*/
+/*-------------------liberation de memoire---------------------------*/
+void freeNOE(NOE n){
 
+  free(n->ETIQ);
+  if (n->FG!= NULL)
+    freeNOE(n->FG);
+  if (n->FD != NULL)
+    freeNOE(n->FD);
+}
+
+void freeENV(ENVTY env){
+  free(env->ID);
+
+  if (env->SUIV != NULL)
+    freeENV(env->SUIV);
+}
+
+
+void freeLFON(LFON l){
+  free(l->ID);
+  if (l->CORPS != NULL)
+    freeNOE(l->CORPS);
+  freeBILE(l->PARAM);
+  freeBILE(l->VARLOC);
+
+
+}
+
+void freeBILE(BILENVTY b){
+  if (b.debut != NULL){
+    freeENV(b.debut);
+    if (b.fin != NULL)
+      freeENV(b.fin);
+  }
+}
+
+void freeBILF(BILFON b){
+  if(b.debut != NULL){
+    freeLFON(b.debut);
+    if (b.fin != NULL)
+      freeLFON(b.fin);
+  }
+}
+
+/*-------------------------------------------------------------------*/
+/*---------------------parcours d'arbres-----------------------------*/
 void prefix(NOE n)
 /* ecrit l'expression n en notation prefixe*/
 { if(n != NULL)
