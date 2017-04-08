@@ -148,7 +148,8 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	    return(tp);                           /* renvoie le type                  */
 	  }
 	case NewAr:                                             /* creation tableau */
-	  {/* a ecrire */
+	  {
+	    type_copy(&tp, e->typno);
 	    return(tp);
 	  }
 	case Af:                                                     /* affectation */
@@ -189,7 +190,22 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	    return(tp);
 	  }
 	case Wh:
-	  {/* a ecrire */
+	  {
+	    type tcom = creer_type(0, T_com);
+	    type tboo = creer_type(0, T_boo);
+	    tfg = e->FG->typno;
+	    tfd = e->FD->typno;
+	    if (type_eq(tfg, tboo) == 0)
+	      {
+		type_copy(&(e->typno), terr);
+		type_copy(&tp, terr);
+		typ_error("Condition non booleenne dans un While", ligne);
+	      }
+	    else
+	      {
+		type_copy(&(e->typno), tcom);
+		type_copy(&tp, tcom);
+	      }
 	    return(tp);
 	  }
 	default: return(tp);                            /* codop inconnu au bataillon */
