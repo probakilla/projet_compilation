@@ -31,117 +31,134 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	  return(tp);}
       /* e != NULL et tous les fils sont bien-types */
       switch(e->codop)
-	{case True:
-	    tp=e->typno;
-	    return(tp);/* typno deja affecte     */
+	{
+	case True:
+	  tp=e->typno;
+	  return(tp);/* typno deja affecte     */
 	case False:
 	  tp=e->typno;
 	  return(tp);/* typno deja affecte     */
 	case Ind: /* (tab_dim k of tau) x   int -> (tab_dim k-1 of tau) */
-	  {/* a ecrire */
+	  {
 	    type tint;
 	    tint=creer_type(0,T_int);
-	    tfg=e->FG->typno;
-	    tfd=e->FD->typno;
-	    if(e->FD->typno.DIM == 0 && e->FG->typno.DIM >= 1)
-	      if (type_eq(tfd, tint))
-		{
-		  e->FG->typno.DIM --;
-		  type_copy(&tp,tfd);
-		  type_copy(&(e->typno),tfd);
-		}
-	      else
-		{type_copy(&tp,terr);
-		  type_copy(&(e->typno),terr);
-		  typ_error("op entier sur args non-entiers",ligne);
-		}
+	    tfg = e->FG->typno;
+	    tfd = e->FD->typno;
+	    if((tfg.DIM > 0) && type_eq(tfd, tint))
+	      {
+		type_copy(&tp, tfg);
+		tp.DIM--;
+		type_copy(&e->typno, tp);
+	      }
+	    else if (tfg.DIM == 0)
+	      {
+		type_copy(&tp, terr);
+		type_copy(&e->typno, tp);
+		typ_error("Index dans un tableau de dimension 0", ligne);
+	      }
 	    else
 	      {
-		type_copy(&tp,terr);
-		type_copy(&(e->typno),terr);
-		typ_error("problème accés tableaux",ligne);
+		type_copy(&tp, terr);
+		type_copy(&e->typno, tp);
+		typ_error("Index non entier dans un tableau", ligne);
 	      }
 	    return(tp);}
 	case Pl:case Mo:case Mu: /* int x  int -> int */
-	  {type tint;    /* type  des fils  */
+	  {
+	    type tint;    /* type  des fils  */
 	    tint=creer_type(0,T_int);
 	    tfg=e->FG->typno;
 	    tfd=e->FD->typno;
 	    if (type_eq(tfg,tint) && type_eq(tfd,tint))
-	      { type_copy(&tp,tfg);        /* calcule le type */
+	      {
+		type_copy(&tp,tfg);        /* calcule le type */
 		type_copy(&(e->typno),tfg);/* affecte le type */
 	      }
 	    else
-	      {type_copy(&tp,terr);/* calcule le type                               */
+	      {
+		type_copy(&tp,terr);/* calcule le type                               */
 		type_copy(&(e->typno),terr); /* affecte type                         */
 		typ_error("op entier sur args non-entiers",ligne);/* message erreur  */
 	      }
 	    return(tp);
 	  }
 	case Lt:case Eq:         /* int x int -> boo                   */
-	  {type tint,tboo;       /* types  entier, booleen             */
+	  {
+	    type tint,tboo;       /* types  entier, booleen             */
 	    tint=creer_type(0,T_int);
 	    tboo=creer_type(0,T_boo);
 	    tfg=e->FG->typno;
 	    tfd=e->FD->typno;
 	    if (type_eq(tfg,tint) && type_eq(tfd,tint))
-	      { type_copy(&tp,tboo);         /* valeur du  type */
+	      {
+		type_copy(&tp,tboo);         /* valeur du  type */
 		type_copy(&(e->typno),tboo); /* affecte le type */
 	      }
 	    else
-	      {type_copy(&tp,terr);/* valeur du  type                               */
+	      {
+		type_copy(&tp,terr);/* valeur du  type                               */
 		type_copy(&(e->typno),terr); /* affecte type                         */
 		typ_error("op de comparaison sur args non-entiers",ligne);/* message */
 	      }
 	    return(tp);
 	  }
 	case And:case Or:        /* boo x boo -> boo                   */
-	  {type tboo;            /* type  booleen                      */
+	  {
+	    type tboo;            /* type  booleen                      */
 	    tboo=creer_type(0,T_boo);
 	    tfg=e->FG->typno;
 	    tfd=e->FD->typno;
 	    if (type_eq(tfg,tboo) && type_eq(tfd,tboo))
-	      { type_copy(&tp,tboo);         /* valeur du  type */
+	      {
+		type_copy(&tp,tboo);         /* valeur du  type */
 		type_copy(&(e->typno),tboo); /* affecte le type */
 	      }
 	    else
-	      {type_copy(&tp,terr);/* valeur du  type                              */
+	      {
+		type_copy(&tp,terr);/* valeur du  type                              */
 		type_copy(&(e->typno),terr); /* affecte type                        */
 		typ_error("op booleen sur args non-booleens",ligne);/*message erreur*/
 	      }
 	    return(tp);
 	  }
 	case Not:                /* boo  -> boo                        */
-	  {type tboo;            /* type  booleen                      */
+	  {
+	    type tboo;            /* type  booleen                      */
 	    tboo=creer_type(0,T_boo);
 	    tfg=e->FG->typno;
 	    assert(e->FD==NULL); /* op unaire                         */
 	    if (type_eq(tfg,tboo))
-	      { type_copy(&tp,tboo);         /* valeur du  type */
+	      {
+		type_copy(&tp,tboo);         /* valeur du  type */
 		type_copy(&(e->typno),tboo); /* affecte le type */
 	      }
 	    else
-	      {type_copy(&tp,terr);/* valeur du  type                               */
+	      {
+		type_copy(&tp,terr);/* valeur du  type                               */
 		type_copy(&(e->typno),terr); /* affecte type                         */
 		typ_error("op booleen sur arg non-booleen",ligne);/* message erreur  */
 	      }
 	    return(tp);
 	  }
 	case I:                  /* constante T_int        */
-	  {type tint;            /* type  du noeud         */
+	  {
+	    type tint;            /* type  du noeud         */
 	    tint=creer_type(0,T_int);
 	    assert(type_eq(e->typno,tint));/*verif du  type */
 	    type_copy(&tp,tint); /* valeur du  type         */
 	    return(tp);
 	  }
 	case V:                  /* variable              */
-	  { ENVTY pos=rechty(e->ETIQ,rho_gb.debut);               /* pos var dans rho */ 
+	  {
+	    ENVTY pos=rechty(e->ETIQ,rho_gb.debut);               /* pos var dans rho */ 
 	    if (pos!=NULL)
-	      { type_copy(&tp, pos->TYPE);        /* valeur du  type := rho(var)      */
+	      {
+		type_copy(&tp, pos->TYPE);        /* valeur du  type := rho(var)      */
 		type_copy(&(e->typno), pos->TYPE);/* affecte le type                  */
 	      }
 	    else
-	      {type_copy(&tp,terr);       /* tp := erreur                             */
+	      {
+		type_copy(&tp,terr);       /* tp := erreur                             */
 		type_copy(&(e->typno),tp); /* affecte type                             */
 		typ_error("variable inconnue ",ligne);/* message erreur                */
 	      };
@@ -153,8 +170,10 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	    return(tp);
 	  }
 	case Af:                                                     /* affectation */
-	  {if (type_eq(e->FG->typno,e->FD->typno)==0)/* type(lhs) <> type(rhs)    */
-	      { type_copy(&(e->typno),terr); /* affecte type                        */
+	  {
+	    if (type_eq(e->FG->typno,e->FD->typno)==0)/* type(lhs) <> type(rhs)    */
+	      {
+		type_copy(&(e->typno),terr); /* affecte type                        */
 		typ_error("affectation de types incoherents ", ligne);
 		return(terr);
 	      }
@@ -163,28 +182,33 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	    return(tp); 
 	  }
 	case Se:
-	  { type tcom= creer_type(0,T_com);         /* type  commande               */
+	  {
+	    type tcom= creer_type(0,T_com);         /* type  commande               */
 	    type_copy(&(e->typno),tcom);
 	    type_copy(&tp,tcom);
 	    return(tp);                             
 	  }
 	case If:
-	  { type tcom= creer_type(0,T_com);         /* type  commande               */
+	  {
+	    type tcom= creer_type(0,T_com);         /* type  commande               */
 	    type tboo=creer_type(0,T_boo);          /* type  booleen                */
 	    tfg=e->FG->typno;                       /* type  des  3 fils            */
 	    type tthen=e->FD->FG->typno; 
 	    type telse=e->FD->FD->typno;
 	    if (type_eq(tfg,tboo)==0)              /* type arg0  <> booleen         */
-	      {type_copy(&(e->typno),terr);        /* affecte type                  */
+	      {
+		type_copy(&(e->typno),terr);        /* affecte type                  */
 		type_copy(&tp,terr);
 		typ_error("condition non booleenne dans un IfThEl", ligne);
 	      }
 	    else if (!type_eq(tthen,tcom) ||!type_eq(telse,tcom))  /* arg <> tcom   */
-	      {type_copy(&(e->typno),terr);                        /* affecte type  */
+	      {
+		type_copy(&(e->typno),terr);                        /* affecte type  */
 		type_copy(&tp,terr);
 	      }
 	    else 
-	      {type_copy(&(e->typno),tcom);                         /* affecte type */
+	      {
+		type_copy(&(e->typno),tcom);                         /* affecte type */
 		type_copy(&tp,tcom);
 	      }
 	    return(tp);
