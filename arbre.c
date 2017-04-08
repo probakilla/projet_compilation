@@ -496,8 +496,19 @@ BILFON concatfn(BILFON bfn1, BILFON bfn2)
 
 BILENVTY allvars(BILFON bfon)
 {
-  //Pas trop compris ce qu'il fallait faire (incomplet)
-  return concatty(bfon.debut->PARAM, bfon.debut->VARLOC);
+  BILENVTY param = bilenvty_vide();
+  BILENVTY varloc = bilenvty_vide();
+  if (bfon.debut != NULL)
+    {
+      LFON fon = bfon.debut;
+      while(fon != NULL)
+	{
+	  param = concatty(param, fon->PARAM);
+	  varloc = concatty(varloc, fon->VARLOC);
+	  fon = fon->SUIV;
+	}
+    }
+  return concatty(param, varloc);
 }
 
 void ecrire_bilfon(BILFON bfn)

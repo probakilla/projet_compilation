@@ -99,13 +99,13 @@ E       :	E Pl E      {$$ = Nalloc();
                              $$->FD = NULL;
                              $$->ETIQ = malloc(2);
                              strcpy($$->ETIQ,"Not");
-			     calcul_type(benvty, $$ , ligcour);
+			     $$->typno = calcul_type(benvty, $$ , ligcour);
 			     }
 	|   '('	E ')'       {$$ = $2;}
 	| 	I           {$$ = $1;}
 	| 	V           {$$ = $1;}
-	| 	True        {$$ = $1;}
-	| 	False       {$$ = $1;}
+        | 	True        {$$ = Nalloc(); $$->codop = T_boo; $$->ETIQ = "true";}
+	| 	False       {$$ = Nalloc(); $$->codop = T_boo; $$->ETIQ = "false";}
         | 	V '(' L_args ')'     {$$ = Nalloc();
                                       $$->codop = NFon;
 				      $$->ETIQ = Idalloc();
@@ -193,9 +193,8 @@ L_args  :       %empty      {$$ = NULL;}
 		
 L_argsnn: 	E               {$$ = $1;}
         |  	E ',' L_argsnn  {$$ = Nalloc();
-                                 $$->codop = 0; // je ne sais pas
 				 $$->FG = $1;
-		                 $$->FD = $3;}//voir si on inverse pas FG et FD
+		                 $$->FD = $3;}
         ;
 			
 L_argt  :       %empty      {$$ = bilenvty_vide ();}
@@ -206,7 +205,7 @@ L_argtnn: 	Argt               {$$ = $1;}
 	| 	L_argtnn ',' Argt  {$$ = concatty ($1, $3);}
 	;
 			
-Argt    :	V ':' TP    {vtycour = creer_envty($1->ETIQ, $3, 0);}// {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
+Argt    :	V ':' TP    {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
         ;
 		
 TP      :	T_boo       {type_copy(&$$, creer_type(0, T_boo));}
@@ -222,10 +221,17 @@ L_vartnn: 	Var Argt               {$$ = $2;}
 	| 	L_vartnn ',' Var Argt  {$$ = concatty ($1, $4);}
 	;
 		
-D_entp  : 	Dep V '(' L_argt ')'  {$$ = creer_bilfon(creer_fon($2->ETIQ, $4, bilenvty_vide(), NULL, creer_type(0, T_bot)));}
+D_entp  : 	Dep NPro '(' L_argt ')'  {LFON fon = Lfonalloc();
+                                          fon->ID = $2->ETIQ;
+					  fon->PARAM = $4;
+					  $$ = creer_bilfon(fon);}
         ;
 		
-D_entf  : 	Def V '(' L_argt ')' ':' TP {$$ = creer_bilfon(creer_fon($2->ETIQ, $4, bilenvty_vide(), NULL, $7));}
+D_entf  : 	Def NFon '(' L_argt ')' ':' TP {LFON fon = Lfonalloc();
+                                                fon->ID = $2->ETIQ;
+						fon->PARAM = $4;
+						fon->TYPRET = $7;
+						$$ = creer_bilfon(fon);}
         ;
 		
 D       :	D_entp L_vart C  {$1.debut->VARLOC = copier_bilenvty($2);
@@ -237,7 +243,7 @@ D       :	D_entp L_vart C  {$1.debut->VARLOC = copier_bilenvty($2);
         ;
 		
 LD      :       %empty     {$$ = bilfon_vide();}
-|	LD D       {$$ = concatfn($1, $2);}
+        |	LD D       {$$ = concatfn($1, $2);}
         ;
 		
 %%
@@ -250,22 +256,22 @@ int yyerror (char* s)
     return EXIT_FAILURE;
 }
 
-/*  pour tester l'analyse 
+/*  pour tester l'analyse */
 int main(int argn, char **argv)
 {
   yyparse();
   ecrire_prog(bifon, benvty,syntree);
   return(1);
-  }*/
+  }
 
-				       /*  pour tester l'interpreteur */
+				       /*  pour tester l'interpreteur 
 int main (int argc, char* argv [])
 {
   yyparse();
   ecrire_prog(bifon, benvty, syntree);
   type terr=creer_type(0,T_err);
   type tcom= creer_type(0,T_com);
-  /*if (type_eq(syntree->typno,terr))
+  if (type_eq(syntree->typno,terr))
     {
       printf("erreur de typage\n");
       return EXIT_FAILURE;
@@ -276,7 +282,7 @@ int main (int argc, char* argv [])
     {
     printf("attention: typage incomplet\n");
     return EXIT_FAILURE;
-    }*/
+    }
   init_memoire;
   printf("Les variables globales avant exec:\n");
   printf("------------------------:\n");
@@ -288,5 +294,5 @@ int main (int argc, char* argv [])
   ecrire_bilenvty(benvty); printf("\n");
   ecrire_memoire(5,5,20);
   return EXIT_SUCCESS;
-}
+  }*/
 

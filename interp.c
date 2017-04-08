@@ -82,7 +82,7 @@ int semval(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb,NOE e)
 	case I:                        /* numeral          */
 	  return (atoi(e->ETIQ));
 	case V:                         /* variable        */
-	  {pos=rechty(e->ETIQ,rho_gb.debut);  
+	  {pos=rechty(e->ETIQ,rho_gb.debut); //rajouté un moyen de d'abord recherché dans l'environnement local si c'est une fonction 
 	     return(pos->VAL);          /* rho_gb(var)     */
 	  }
 	case NewAr:                     /*creation tableau */
