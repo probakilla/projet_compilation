@@ -63,7 +63,7 @@ void ecrire_memoire(int maxadr, int maxtal, int maxtas)
 
 /* semantique op a grands pas des expressions                         */
 /* fait agir e sur rho_gb, le  modifie, retourne val(e)               */
-int semval(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb,NOE e) 
+int semval(BILFON rho_fn, BILENVTY rho_gb,NOE e) 
 { if(e != NULL)
     {ENVTY pos;
       int res,taille;
@@ -71,14 +71,14 @@ int semval(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb,NOE e)
 	{
 	 case Ind:
 	   {
-	     int tab = semval (rho_fn, rho_lc, rho_gb, e->FG);
-	     int ind = semval (rho_fn, rho_lc, rho_gb, e->FD);
+	     int tab = semval (rho_fn, rho_gb, e->FG);
+	     int ind = semval (rho_fn, rho_gb, e->FD);
 	     return TAS[ADR[tab] + ind];
 	   }
 	  case Pl:case Mo:case Mu:case And:case Or:case Lt:case  Eq:/* op binaire     */
-	    return(eval(e->codop,semval(rho_fn, rho_lc, rho_gb,e->FG),semval(rho_fn, rho_lc, rho_gb,e->FD)));
+	    return(eval(e->codop,semval(rho_fn, rho_gb,e->FG),semval(rho_fn, rho_gb,e->FD)));
 	case Not:                                            /* operation unaire      */
-	  return(eval(e->codop,semval(rho_fn, rho_lc, rho_gb,e->FG),0));
+	  return(eval(e->codop,semval(rho_fn, rho_gb,e->FG),0));
 	case I:                        /* numeral          */
 	  return (atoi(e->ETIQ));
 	case V:                         /* variable        */
@@ -91,7 +91,7 @@ int semval(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb,NOE e)
 	  return 1;
 	case NewAr:                     /*creation tableau */
 	  {
-	    int taille = semval (rho_fn, rho_lc, rho_gb, e->FD);
+	    int taille = semval (rho_fn, rho_gb, e->FD);
 	    res = padrl;
 	    ADR[res] = ptasl;
 	    ptasl += taille;
@@ -99,39 +99,53 @@ int semval(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb,NOE e)
 	    padrl++;
 	    return res;
 	  }
-	case Dep:
-	case Def:
+	  case NFon:
 	  {
-	    //peut être faire un semop_gp sur le corps de la fonction ?
-	    
+	    LFON fon = rechfon(e->ETIQ, rho_fn.debut);
+	    if (fon != NULL)
+	      {
+		BILENVTY bil = concatty(fon->PARAM, fon->VARLOC);
+		bil = concatty(bil, rho_gb);
+		semop_gp(rho_fn, bil, fon->CORPS);
+		ENVTY env = rechty(e->ETIQ, bil.debut);
+		if (env == NULL)
+		  {
+		  printf("J'ai fait du gros caca\n");
+		  return(EXIT_FAILURE);
+		  }
+		printf("%d\n",env->VAL);
+		return env->VAL;
+	      }
+	    printf("La fonction %s n'est pas définit\n", e->ETIQ);
 	  }
-	default: return(EXIT_FAILURE);  /* codop inconnu au bataillon */
-	  }
+	default:
+	  return(EXIT_FAILURE);  /* codop inconnu au bataillon */
 	}
+    }
   else
     return(EXIT_FAILURE);
 }
 
 /* semantique op a grands pas des commandes                      */
 /* fait agir c sur rho_gb, le  modifie                           */
-void semop_gp(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb, NOE c)
+void semop_gp(BILFON rho_fn, BILENVTY rho_gb, NOE c)
 {char *lhs; int rhs; int cond;
  if(c != NULL)
     {switch(c->codop)
        {case Mp:
-	    semop_gp(rho_fn, rho_lc, rho_gb, c->FG);
+	    semop_gp(rho_fn, rho_gb, c->FG);
 	    break;
 	case Af:
 	  if (c->FG->codop==V)        /* affectation a une variable */
 	    {lhs= c->FG->ETIQ;
 	     printf("lhs vaut %s \n",lhs);
-	     rhs= semval(rho_fn, rho_lc, rho_gb, c->FD);
+	     rhs= semval(rho_fn, rho_gb, c->FD);
 	     if (c->FD->codop==NewAr)
 	       {
 	       ENVTY pos=rechty(lhs,rho_gb.debut);
 	       if (pos!=NULL)
 		 {
-		   int taille= semval(rho_fn, rho_lc, rho_gb, c->FD->FD);
+		   int taille= semval(rho_fn, rho_gb, c->FD->FD);
 		   pos->TYPE.TAILLE=taille;
 		 }
 	       }
@@ -141,32 +155,32 @@ void semop_gp(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb, NOE c)
 	  else
 	    {
 	      assert(c->FG->codop==Ind);/* affectation a un tableau */
-	      int tab = semval(rho_fn, rho_lc, rho_gb, c->FG->FG);
-	      int ind = semval(rho_fn, rho_lc, rho_gb, c->FG->FD);
+	      int tab = semval(rho_fn, rho_gb, c->FG->FG);
+	      int ind = semval(rho_fn, rho_gb, c->FG->FD);
 	      char *ntab = c->FG->FG->ETIQ;
 	      ENVTY pos = rechty(c->FG->FG->ETIQ, rho_gb.debut); 
 	      if(ind >= pos->TYPE.TAILLE)
-		printf("ERREUR:Affectation de %d en dehors de la taille du tableau %s\n", semval(rho_fn, rho_lc, rho_gb, c->FD) , ntab);
+		printf("ERREUR:Affectation de %d en dehors de la taille du tableau %s\n", semval(rho_fn, rho_gb, c->FD) , ntab);
 	      else
-		TAS[ADR[tab] + ind] = semval(rho_fn, rho_lc, rho_gb, c->FD);//TODO: tester ind < taille du tableau
+		TAS[ADR[tab] + ind] = semval(rho_fn, rho_gb, c->FD);//TODO: tester ind < taille du tableau
 	    }
 	  break;	    
 	case Sk: break;
 	case Se: 
-	  semop_gp(rho_fn, rho_lc, rho_gb, c->FG);
-	  semop_gp(rho_fn, rho_lc, rho_gb, c->FD);
+	  semop_gp(rho_fn, rho_gb, c->FG);
+	  semop_gp(rho_fn, rho_gb, c->FD);
 	  break; 
 	case If:
-	  if (semval(rho_fn, rho_lc, rho_gb, c->FG))
-	    semop_gp(rho_fn, rho_lc, rho_gb, c->FD->FG);
+	  if (semval(rho_fn, rho_gb, c->FG))
+	    semop_gp(rho_fn, rho_gb, c->FD->FG);
 	  else
-	    semop_gp(rho_fn, rho_lc, rho_gb, c->FD->FD);
+	    semop_gp(rho_fn, rho_gb, c->FD->FD);
 	  break;
 	case Wh:
-	  while (semval(rho_fn, rho_lc, rho_gb,  c->FG))
+	  while (semval(rho_fn, rho_gb,  c->FG))
 	    {
-	    semop_gp(rho_fn, rho_lc, rho_gb, c->FD);
-	    semop_gp(rho_fn, rho_lc, rho_gb, c);
+	    semop_gp(rho_fn, rho_gb, c->FD);
+	    semop_gp(rho_fn, rho_gb, c);
 	    }
 	  break;
 	default: break;

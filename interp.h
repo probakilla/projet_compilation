@@ -8,9 +8,9 @@ void init_memoire();/* initialise le tas: TAS, ADR, TAL                         
 /* decrit la memoire: ADR, TAL, TAS */
 void ecrire_memoire(int maxadr, int maxtal, int maxtas);
 /* semantique op a grands pas des expressions */  
-extern int semval(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb, NOE e);
+extern int semval(BILFON rho_fn, BILENVTY rho_gb, NOE e);
 /*semantique op a grdspas des commandes                                          */
-extern void semop_gp(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb, NOE c);
+extern void semop_gp(BILFON rho_fn, BILENVTY rho_gb, NOE c);
 /*---------------------VARIABLES globales ---------------------------------------*/
 extern NOE syntree;          /* arbre syntaxique                      (y.tab.c)  */
 extern int TAS [TAILLEMEM];  /* le tas; (NIL=0); "vraies" adresses >=1(y.tab.c)  */

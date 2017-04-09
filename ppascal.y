@@ -117,7 +117,7 @@ E       :	E Pl E      {$$ = Nalloc();
                                       $$->codop = NewAr;
                                       type_copy(&($$->typno),$2); /* DIM,TYPEF sont connus   */
 				      ($$->typno).DIM++;          /* mise a jour DIM         */
-				      ($$->typno).TAILLE=semval(bifon, lenvty, benvty, $4);
+				      ($$->typno).TAILLE=semval(bifon, benvty, $4);
 				      
       	 			      $$->FG=NULL;
 				      $$->FD=$4;}
@@ -284,9 +284,9 @@ int main(int argn, char **argv)
 /*  pour tester l'interpreteur */
 int main (int argc, char* argv [])
 {
-  yyparse();
-  ecrire_prog(bifon, benvty, syntree);
-  type terr=creer_type(0,0,T_err);
+  yyparse();printf("\n");
+  ecrire_prog(bifon, benvty, syntree);printf("\n");
+  /* type terr=creer_type(0,0,T_err);
   type tcom= creer_type(0,0,T_com);
   if (type_eq(syntree->typno,terr))
     {
@@ -299,13 +299,13 @@ int main (int argc, char* argv [])
     {
     printf("attention: typage incomplet\n");
     return EXIT_FAILURE;
-    }
+    }*/
   init_memoire;
   printf("Les variables globales avant exec:\n");
   printf("------------------------:\n");
   ecrire_bilenvty(benvty); printf("\n");
-  ecrire_memoire(5,5,20);
-  semop_gp(bifon, lenvty, benvty, syntree);
+  ecrire_memoire(5,5,20);printf("\n");
+  semop_gp(bifon, benvty, syntree);printf("\n");
   printf("Les variables globales apres exec:\n");
   printf("------------------------:\n");
   ecrire_bilenvty(benvty); printf("\n");

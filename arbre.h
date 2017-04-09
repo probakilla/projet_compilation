@@ -68,7 +68,6 @@ extern void ecrire_type(type tp);      /* ecrit le type                         
 extern int ecrire_envty(ENVTY rho);/* affiche l'environnement type               */
 extern int eval(int op, int arg1, int arg2); /* retourne (arg1 op arg2)          */
 extern ENVTY rechty(char *chaine, ENVTY listident);/* retourne la position de chaine*/
-/* retourne la position de chaine (rho_lc est prioritaire) */
 extern int affectty(ENVTY rho, char *var, type tpvar, int val);/*   affecte var  */
 extern int valchty(ENVTY rho, char *var); /* valeur de var dans envirnt-type rho */
 /*---------------------bilistes-de-var-typees------------------------------------*/

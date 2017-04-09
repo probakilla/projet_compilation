@@ -419,18 +419,19 @@ LFON copier_fon(LFON lfn)
 void ecrire_fon(LFON bfn)
 {
   if (bfn == NULL)
-    printf("fin d'environnement \n");
+    printf("\nfin d'environnement \n");
   else
     {
-      printf("Nom de la fonction: %s\n", bfn->ID);
+      printf("\nNom de la fonction: %s\n", bfn->ID);
       printf("  Paramètre de la fonction:\n");
       ecrire_bilenvty(bfn->PARAM);
       printf("Les variables locales:\n");
       ecrire_bilenvty(bfn->VARLOC);
       printf("  Corps de la fonction:\n");
       prefix(bfn->CORPS);
-      printf("  Type de retour\n");
+      printf("\n  Type de retour\n");
       ecrire_type(bfn->TYPRET);
+      ecrire_fon(bfn->SUIV);
     }
 }
 
