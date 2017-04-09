@@ -6,6 +6,7 @@
 /* type: tableau */
 typedef struct type{
   int DIM;   /* dimension ; vaut 0 ssi type de base                           */
+  int TAILLE; /* Taille seulement pour les tableaux                           */
   int TYPEF; /* type des cellules de plus petite dim: T_int ou T_com ou T_err */
 }type;
 
@@ -59,7 +60,7 @@ extern LFON  Lfonalloc();    /* retourne un LFON                                
 extern int  type_eq(type t1, type t2);/* 1 si t1 ==t2 , 0 sinon                  */
 extern void type_copy(type *tcop, type torig);/* copie torig vers tcop           */
 extern void type_affect(ENVTY rho, type tvar);/* affecte le type  de   *rho      */
-extern type creer_type(int dm, int tf);        /* retourne le type               */
+extern type creer_type(int dm, int taille, int tf);        /* retourne le type               */
 extern ENVTY creer_envty(char *etiq, type tau,int val);/*pointe vers cette var typee*/
 extern ENVTY copier_envty(ENVTY env);/*pointe vers une copie                     */
 extern char *nomop(int codop);/* traduit entier vers chaine (= nom operation)    */

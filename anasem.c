@@ -20,10 +20,10 @@ void typ_error(char *mess,int ligne)
 /* renvoie T_err si l'arbre est mal-type                                       */
 type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 { type tp;
-  tp= creer_type(0,T_bot);/* type par defaut */
+  tp= creer_type(0,0,T_bot);/* type par defaut */
   if(e != NULL)
     { type tfg,tfd;                /* type  du fils gauche, fils droit */
-      type terr=creer_type(0,T_err);   /* type  erreur                 */
+      type terr=creer_type(0,0,T_err);   /* type  erreur                 */
       /* un des fils est mal-type */
       if ((e->FG && type_eq(e->FG->typno,terr))||(e->FD && type_eq(e->FD->typno,terr)))
 	{type_copy(&tp,terr);/* valeur du  type                              */
@@ -41,7 +41,7 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	case Ind: /* (tab_dim k of tau) x   int -> (tab_dim k-1 of tau) */
 	  {
 	    type tint;
-	    tint=creer_type(0,T_int);
+	    tint=creer_type(0,0,T_int);
 	    tfg = e->FG->typno;
 	    tfd = e->FD->typno;
 	    if((tfg.DIM > 0) && type_eq(tfd, tint))
@@ -66,7 +66,7 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	case Pl:case Mo:case Mu: /* int x  int -> int */
 	  {
 	    type tint;    /* type  des fils  */
-	    tint=creer_type(0,T_int);
+	    tint=creer_type(0,0,T_int);
 	    tfg=e->FG->typno;
 	    tfd=e->FD->typno;
 	    if (type_eq(tfg,tint) && type_eq(tfd,tint))
@@ -85,8 +85,8 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	case Lt:case Eq:         /* int x int -> boo                   */
 	  {
 	    type tint,tboo;       /* types  entier, booleen             */
-	    tint=creer_type(0,T_int);
-	    tboo=creer_type(0,T_boo);
+	    tint=creer_type(0,0,T_int);
+	    tboo=creer_type(0,0,T_boo);
 	    tfg=e->FG->typno;
 	    tfd=e->FD->typno;
 	    if (type_eq(tfg,tint) && type_eq(tfd,tint))
@@ -105,7 +105,7 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	case And:case Or:        /* boo x boo -> boo                   */
 	  {
 	    type tboo;            /* type  booleen                      */
-	    tboo=creer_type(0,T_boo);
+	    tboo=creer_type(0,0,T_boo);
 	    tfg=e->FG->typno;
 	    tfd=e->FD->typno;
 	    if (type_eq(tfg,tboo) && type_eq(tfd,tboo))
@@ -124,7 +124,7 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	case Not:                /* boo  -> boo                        */
 	  {
 	    type tboo;            /* type  booleen                      */
-	    tboo=creer_type(0,T_boo);
+	    tboo=creer_type(0,0,T_boo);
 	    tfg=e->FG->typno;
 	    assert(e->FD==NULL); /* op unaire                         */
 	    if (type_eq(tfg,tboo))
@@ -143,7 +143,7 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	case I:                  /* constante T_int        */
 	  {
 	    type tint;            /* type  du noeud         */
-	    tint=creer_type(0,T_int);
+	    tint=creer_type(0,0,T_int);
 	    assert(type_eq(e->typno,tint));/*verif du  type */
 	    type_copy(&tp,tint); /* valeur du  type         */
 	    return(tp);
@@ -178,20 +178,20 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 		return(terr);
 	      }
 	    else                                     /* type(lhs) == type(rhs)      */
-	      type_copy(&(e->typno), creer_type(0,T_com));
+	      type_copy(&(e->typno), creer_type(0,0,T_com));
 	    return(tp); 
 	  }
 	case Se:
 	  {
-	    type tcom= creer_type(0,T_com);         /* type  commande               */
+	    type tcom= creer_type(0,0,T_com);         /* type  commande               */
 	    type_copy(&(e->typno),tcom);
 	    type_copy(&tp,tcom);
 	    return(tp);                             
 	  }
 	case If:
 	  {
-	    type tcom= creer_type(0,T_com);         /* type  commande               */
-	    type tboo=creer_type(0,T_boo);          /* type  booleen                */
+	    type tcom= creer_type(0,0,T_com);         /* type  commande               */
+	    type tboo=creer_type(0,0,T_boo);          /* type  booleen                */
 	    tfg=e->FG->typno;                       /* type  des  3 fils            */
 	    type tthen=e->FD->FG->typno; 
 	    type telse=e->FD->FD->typno;
@@ -215,8 +215,8 @@ type calcul_type(BILENVTY rho_gb, NOE e, int ligne)
 	  }
 	case Wh:
 	  {
-	    type tcom = creer_type(0, T_com);
-	    type tboo = creer_type(0, T_boo);
+	    type tcom = creer_type(0, 0, T_com);
+	    type tboo = creer_type(0, 0, T_boo);
 	    tfg = e->FG->typno;
 	    tfd = e->FD->typno;
 	    if (type_eq(tfg, tboo) == 0)

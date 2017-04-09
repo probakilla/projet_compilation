@@ -117,8 +117,10 @@ E       :	E Pl E      {$$ = Nalloc();
                                       $$->codop = NewAr;
                                       type_copy(&($$->typno),$2); /* DIM,TYPEF sont connus   */
 				      ($$->typno).DIM++;          /* mise a jour DIM         */
+				      ($$->typno).TAILLE=semval(bifon, lenvty, benvty, $4);
+				      
       	 			      $$->FG=NULL;
-				      $$->FD=$4;          /* TAILLE a calculer a partir de E */}
+				      $$->FD=$4;}
 	| 	Et          {$$ = $1;}
         ;
 
@@ -174,7 +176,7 @@ Ca       : 	Et Af E     {$$ = Nalloc();
 				   calcul_type(benvty, $$ , ligcour);}
 	| 	Wh E Do Ca   {$$ = Nalloc();
                              $$->codop = Wh;
-			     type_copy(&($$->typno), creer_type(0,T_com));
+			     type_copy(&($$->typno), creer_type(0,0,T_com));
                              $$->FG = $2;         /* condition d'entree dans le while */
                              $$->FD = $4;         /* corps du while                   */
                              $$->ETIQ = malloc(2);
@@ -209,9 +211,9 @@ L_argtnn: 	Argt               {$$ = $1;}
 Argt    :	V ':' TP    {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
         ;
 		
-TP      :	T_boo       {$$ = $1;}//type_copy(&$$, creer_type(0, T_boo));}
-        |  	T_int       {$$ = $1;}//type_copy(&$$, creer_type(0, T_int));}
-        |  	T_ar TP     {$$ = $2; $$.DIM++;}//type_copy(&$$, $2), $$.DIM++;}
+TP      :	T_boo       {$$ = $1;}
+        |  	T_int       {$$ = $1;}
+        |  	T_ar TP     {$$ = $2; $$.DIM++;}
         ;
 		
 L_vart  :       %empty      {$$ = bilenvty_vide(); benvty = $$;}
@@ -257,13 +259,13 @@ int yyerror (char* s)
     return EXIT_FAILURE;
 }
 
-/*  pour tester l'analyse */
+/*  pour tester l'analyse 
 int main(int argn, char **argv)
 {
   yyparse();
   ecrire_prog(bifon, benvty,syntree);
-  type terr=creer_type(0,T_err);
-  type tcom= creer_type(0,T_com);
+  type terr=creer_type(0,0,T_err);
+  type tcom= creer_type(0,0,T_com);
   if (type_eq(syntree->typno,terr))
     {
       printf("erreur de typage\n");
@@ -277,15 +279,15 @@ int main(int argn, char **argv)
     return EXIT_FAILURE;
     }
   return(1);
-  }
+  }*/
 
-				       /*  pour tester l'interpreteur 
+/*  pour tester l'interpreteur */
 int main (int argc, char* argv [])
 {
   yyparse();
   ecrire_prog(bifon, benvty, syntree);
-  type terr=creer_type(0,T_err);
-  type tcom= creer_type(0,T_com);
+  type terr=creer_type(0,0,T_err);
+  type tcom= creer_type(0,0,T_com);
   if (type_eq(syntree->typno,terr))
     {
       printf("erreur de typage\n");
@@ -309,5 +311,5 @@ int main (int argc, char* argv [])
   ecrire_bilenvty(benvty); printf("\n");
   ecrire_memoire(5,5,20);
   return EXIT_SUCCESS;
-  }*/
+  }
 

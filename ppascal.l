@@ -18,18 +18,18 @@ caractere         [A-Za-z0-9\-\_]
 <COMMENT>.                 {;}
 skip                       {yylval.NO=Nalloc();
                            (yylval.NO)->codop = Sk;
-                           tycour=creer_type(0,T_com);
+                           tycour=creer_type(0,0,T_com);
                            (yylval.NO)->FG = NULL;
                            (yylval.NO)->FD = NULL;
                            (yylval.NO)->ETIQ = Idalloc();
                            strcpy((yylval.NO)->ETIQ,yytext);
-                           type_copy(&((yylval.NO)->typno),creer_type(0,T_com));
+                           type_copy(&((yylval.NO)->typno),creer_type(0,0,T_com));
                            return(Sk);}
 new{sep}array{sep}of       {return(NewAr);}
 array{sep}of               {return(T_ar);}
-integer                    {type_copy(&(yylval.TYP),creer_type(0,T_int));
+integer                    {type_copy(&(yylval.TYP),creer_type(0,0,T_int));
                             return(T_int);}
-boolean                    {type_copy(&(yylval.TYP),creer_type(0,T_boo));
+boolean                    {type_copy(&(yylval.TYP),creer_type(0,0,T_boo));
                             return(T_boo);}
 if                         {return(If);}
 then                       {return(Th);}
@@ -47,7 +47,7 @@ do                         {return(Do);}
 "="                        {return(Eq);}
 "true"                     {yylval.NO=Nalloc();
                            (yylval.NO)->codop = True;
-			   type_copy(&((yylval.NO)->typno),creer_type(0,T_boo)); 
+			   type_copy(&((yylval.NO)->typno),creer_type(0,0,T_boo)); 
                            (yylval.NO)->FG = NULL;
                            (yylval.NO)->FD = NULL;
 			   (yylval.NO)->ETIQ = malloc(yyleng + 1);
@@ -55,7 +55,7 @@ do                         {return(Do);}
 			   return(True);}
 "false"                    {yylval.NO=Nalloc();
                            (yylval.NO)->codop = False;
-			   type_copy(&((yylval.NO)->typno),creer_type(0,T_boo)); 
+			   type_copy(&((yylval.NO)->typno),creer_type(0,0,T_boo)); 
                            (yylval.NO)->FG = NULL;
                            (yylval.NO)->FD = NULL;
 			   (yylval.NO)->ETIQ = malloc(yyleng + 1);
@@ -90,8 +90,8 @@ do                         {return(Do);}
 0|[1-9][0-9]*              {yylval.NO=Nalloc(); /*entier positif; AF:cas negatif*/
                            (yylval.NO)->codop = I;  /* entier                   */
                            printf("analyse lex, token I,l1 \n");
-                           tycour=creer_type(0,T_int);
-                           type_copy(&((yylval.NO)->typno),creer_type(0,T_int));
+                           tycour=creer_type(0,0,T_int);
+                           type_copy(&((yylval.NO)->typno),creer_type(0,0,T_int));
                            printf("analyse lex,token I,l2 \n");
                            (yylval.NO)->FG = NULL;
                            (yylval.NO)->FD = NULL;

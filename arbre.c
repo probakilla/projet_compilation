@@ -101,6 +101,7 @@ int type_eq(type t1, type t2)
 /* copie torig vers *tcop  */
 void type_copy(type *tcop,type torig)
 {tcop->DIM=torig.DIM;
+  tcop->TAILLE=torig.TAILLE;
   tcop->TYPEF=torig.TYPEF;
   return;
 }
@@ -108,14 +109,15 @@ void type_copy(type *tcop,type torig)
 /* affecte le type  de *prho      */
 void type_affect(ENVTY rho,type tvar)
 {(rho->TYPE).DIM=tvar.DIM;
+  (rho->TYPE).TAILLE=tvar.TAILLE;
   (rho->TYPE).TYPEF=tvar.TYPEF;
-  return;
 }
 
 /* retourne le type                  */
-type creer_type(int dm,  int tf)
+type creer_type(int dm, int taille, int tf)
 {type TT;
   TT.DIM=dm;
+  TT.TAILLE=taille;
   TT.TYPEF=tf;
   return(TT);
 }
@@ -250,7 +252,7 @@ char *nomop(int codop)
 
 /* ecrit le type */
 void ecrire_type(type tp)
-{printf("DIM:%d,TYPEF:%d,",tp.DIM,tp.TYPEF);
+{printf("DIM:%d,TAILLE:%d,TYPEF:%d,",tp.DIM,tp.TAILLE,tp.TYPEF);
 }
 
 /* affiche l'environnement type      */  
