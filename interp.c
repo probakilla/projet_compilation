@@ -127,8 +127,8 @@ void semop_gp(BILFON rho_fn, BILENVTY rho_lc, BILENVTY rho_gb, NOE c)
 	       ENVTY pos=rechty(lhs,rho_gb.debut);
 	       if (pos!=NULL)
 		 {
-		   rhs= semval(rho_fn, rho_lc, rho_gb, c->FD->FD);
-		   pos->TYPE.TAILLE=rhs;
+		   int taille= semval(rho_fn, rho_lc, rho_gb, c->FD->FD);
+		   pos->TYPE.TAILLE=taille;
 		 }
 	       }
 	     printf("rhs vaut %d \n",rhs);
