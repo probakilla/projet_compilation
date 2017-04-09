@@ -103,9 +103,10 @@ E       :	E Pl E      {$$ = Nalloc();
 			     }
 	|   '('	E ')'       {$$ = $2;}
 	| 	I           {$$ = $1;}
-	| 	V           {$$ = $1;}
-        | 	True        {$$ = Nalloc(); $$->codop = T_boo; $$->ETIQ = "true";}
-	| 	False       {$$ = Nalloc(); $$->codop = T_boo; $$->ETIQ = "false";}
+	| 	V           {$$ = $1;
+                             calcul_type(benvty, $$ , ligcour);}
+        | 	True        {$$ = $1;}
+        | 	False       {$$ = $1;}
         | 	V '(' L_args ')'     {$$ = Nalloc();
                                       $$->codop = NFon;
 				      $$->ETIQ = Idalloc();
@@ -208,9 +209,9 @@ L_argtnn: 	Argt               {$$ = $1;}
 Argt    :	V ':' TP    {$$ = creer_bilenvty(creer_envty($1->ETIQ,$3,0));}
         ;
 		
-TP      :	T_boo       {type_copy(&$$, creer_type(0, T_boo));}
-        |  	T_int       {type_copy(&$$, creer_type(0, T_int));}
-        | 	T_ar TP     {type_copy(&$$, $2), $$.DIM++;}
+TP      :	T_boo       {$$ = $1;}//type_copy(&$$, creer_type(0, T_boo));}
+        |  	T_int       {$$ = $1;}//type_copy(&$$, creer_type(0, T_int));}
+        |  	T_ar TP     {$$ = $2; $$.DIM++;}//type_copy(&$$, $2), $$.DIM++;}
         ;
 		
 L_vart  :       %empty      {$$ = bilenvty_vide(); benvty = $$;}
@@ -261,6 +262,20 @@ int main(int argn, char **argv)
 {
   yyparse();
   ecrire_prog(bifon, benvty,syntree);
+  type terr=creer_type(0,T_err);
+  type tcom= creer_type(0,T_com);
+  if (type_eq(syntree->typno,terr))
+    {
+      printf("erreur de typage\n");
+      return EXIT_FAILURE;
+    }
+  else if (type_eq(syntree->typno,tcom))
+    printf("programme bien type\n");
+  else
+    {
+    printf("attention: typage incomplet\n");
+    return EXIT_FAILURE;
+    }
   return(1);
   }
 

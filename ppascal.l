@@ -27,8 +27,10 @@ skip                       {yylval.NO=Nalloc();
                            return(Sk);}
 new{sep}array{sep}of       {return(NewAr);}
 array{sep}of               {return(T_ar);}
-integer                    {return(T_int);}
-boolean                    {return(T_boo);}
+integer                    {type_copy(&(yylval.TYP),creer_type(0,T_int));
+                            return(T_int);}
+boolean                    {type_copy(&(yylval.TYP),creer_type(0,T_boo));
+                            return(T_boo);}
 if                         {return(If);}
 then                       {return(Th);}
 else                       {return(El);}
@@ -43,8 +45,22 @@ do                         {return(Do);}
 "not"                      {return(Not);}
 "<"                        {return(Lt);}
 "="                        {return(Eq);}
-"true"                     {return(True);}
-"false"                    {return(False);}
+"true"                     {yylval.NO=Nalloc();
+                           (yylval.NO)->codop = True;
+			   type_copy(&((yylval.NO)->typno),creer_type(0,T_boo)); 
+                           (yylval.NO)->FG = NULL;
+                           (yylval.NO)->FD = NULL;
+			   (yylval.NO)->ETIQ = malloc(yyleng + 1);
+                           strcpy((yylval.NO)->ETIQ,yytext);
+			   return(True);}
+"false"                    {yylval.NO=Nalloc();
+                           (yylval.NO)->codop = False;
+			   type_copy(&((yylval.NO)->typno),creer_type(0,T_boo)); 
+                           (yylval.NO)->FG = NULL;
+                           (yylval.NO)->FD = NULL;
+			   (yylval.NO)->ETIQ = malloc(yyleng + 1);
+                           strcpy((yylval.NO)->ETIQ,yytext);
+			   return(False);}
 "defun"                      {declare = declareFonction; return(Def);}
 "defpro"                     {declare = declareProcedure; return(Dep);}
 <INITIAL>{lettre}{caractere}* {yylval.NO=Nalloc();
