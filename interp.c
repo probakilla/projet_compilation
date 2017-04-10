@@ -82,7 +82,7 @@ int semval(BILFON rho_fn, BILENVTY rho_gb,NOE e)
 	case I:                        /* numeral          */
 	  return (atoi(e->ETIQ));
 	case V:                         /* variable        */
-	  {pos=rechty(e->ETIQ,rho_gb.debut); //rajouté un moyen de d'abord recherché dans l'environnement local si c'est une fonction 
+	  {pos=rechty(e->ETIQ,rho_gb.debut);
 	   return(pos->VAL);          /* rho_gb(var)     */
 	  }
 	case False:
@@ -162,7 +162,7 @@ void semop_gp(BILFON rho_fn, BILENVTY rho_gb, NOE c)
 	      if(ind >= pos->TYPE.TAILLE)
 		printf("ERREUR:Affectation de %d en dehors de la taille du tableau %s\n", semval(rho_fn, rho_gb, c->FD) , ntab);
 	      else
-		TAS[ADR[tab] + ind] = semval(rho_fn, rho_gb, c->FD);//TODO: tester ind < taille du tableau
+		TAS[ADR[tab] + ind] = semval(rho_fn, rho_gb, c->FD);
 	    }
 	  break;	    
 	case Sk: break;
@@ -185,8 +185,7 @@ void semop_gp(BILFON rho_fn, BILENVTY rho_gb, NOE c)
 	  break;
 	default: break;
 	}
-    };
-return;
+    }
 }
 
 

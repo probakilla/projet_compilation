@@ -3,6 +3,11 @@
   -Jimmy Menan
   -Julien Pilleux
   -Guillaume Chupin
+  Question 1: Réalisé dans ppascal.y
+  Question 2: Fonction calcul_type dans anasem.c
+  Question 3: Fonction semop_gp dans interp.c
+  Question 4: Non traitée
+  Question 5: Non traitée
 */
 %{
 #include <stdio.h>
@@ -17,7 +22,6 @@ int yyerror (char *s);
 /* ------------------VARIABLES GLOBALES -------------------------*/
   NOE syntree;          /* commande  globale                     */
   BILENVTY benvty;      /* environnement global                  */
-  BILENVTY lenvty;      /* environnement local                   */
   BILFON bifon;         /* environnement fonctions               */
   int ligcour=1;        /* ligne  courante                       */
   type tycour;          /* type courant                          */
@@ -259,11 +263,10 @@ int yyerror (char* s)
     return EXIT_FAILURE;
 }
 
-/*  pour tester l'analyse 
-int main(int argn, char **argv)
+int main (int argc, char* argv [])
 {
-  yyparse();
-  ecrire_prog(bifon, benvty,syntree);
+  yyparse();printf("\n");
+  ecrire_prog(bifon, benvty, syntree);printf("\n");
   type terr=creer_type(0,0,T_err);
   type tcom= creer_type(0,0,T_com);
   if (type_eq(syntree->typno,terr))
@@ -278,28 +281,6 @@ int main(int argn, char **argv)
     printf("attention: typage incomplet\n");
     return EXIT_FAILURE;
     }
-  return(1);
-  }*/
-
-/*  pour tester l'interpreteur */
-int main (int argc, char* argv [])
-{
-  yyparse();printf("\n");
-  ecrire_prog(bifon, benvty, syntree);printf("\n");
-  /* type terr=creer_type(0,0,T_err);
-  type tcom= creer_type(0,0,T_com);
-  if (type_eq(syntree->typno,terr))
-    {
-      printf("erreur de typage\n");
-      return EXIT_FAILURE;
-    }
-  else if (type_eq(syntree->typno,tcom))
-    printf("programme bien type\n");
-  else
-    {
-    printf("attention: typage incomplet\n");
-    return EXIT_FAILURE;
-    }*/
   init_memoire;
   printf("Les variables globales avant exec:\n");
   printf("------------------------:\n");
