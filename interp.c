@@ -108,11 +108,6 @@ int semval(BILFON rho_fn, BILENVTY rho_gb,NOE e)
 		bil = concatty(bil, rho_gb);
 		semop_gp(rho_fn, bil, fon->CORPS);
 		ENVTY env = rechty(e->ETIQ, bil.debut);
-		if (env == NULL)
-		  {
-		  printf("J'ai fait du gros caca\n");
-		  return(EXIT_FAILURE);
-		  }
 		printf("%d\n",env->VAL);
 		return env->VAL;
 	      }
